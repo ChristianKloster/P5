@@ -1,0 +1,177 @@
+﻿chainid;Chainname;id;Name;Address;postalcode;city;country
+1;OneChain;2;OneStore - Holbæk (ZF);Ahlgade ;4300;Holbæk;Denmark
+1;OneChain;3;OneStore - Storcenter Nord;Storcenter Nord;8200;Århus;Denmark
+1;OneChain;4;OneStore - Amagerbrogade;Amagerbrogade ;2300;København;Denmark
+1;OneChain;5;OneStore - Allum;Gamla Kronvägen ;43333;Allum;Sweden
+1;OneChain;7;OneStore - City 2;City ;2630;Høje Taastrup;Denmark
+1;OneChain;8;OneStore - Down Town;addresse;-1;Oslo;Norway
+1;OneChain;9;OneStore - Esbjerg;Kongensgade ;6700;Esbjerg;Denmark
+1;OneChain;10;OneStore - Fisketorvet;Fisketorvet;1560;København;Denmark
+1;OneChain;11;OneStore - Frederiksberg;Frederiksberg Centret;2000;Frederiksberg;Denmark
+1;OneChain;12;OneStore - Frederikshavn;Danmarkgade A;9900;Frederikshavn;Denmark
+1;OneChain;14;OneStore - Glostrup;Glostrup Shoppingcenter ;2600;Glostrup;Denmark
+1;OneChain;15;OneStore - Haderslev;Gravene ;6100;Haderslev;Denmark
+1;OneChain;16;OneStore - Koskikeskus;Hatanpään Valtatie ;33100;Tampere;Finland
+1;OneChain;17;OneStore - Ballerup;Ballerup Centret;2750;Ballerup;Denmark
+1;OneChain;22;OneStore - Oslo City;Stenersgata ;50;Oslo;Norway
+1;OneChain;23;OneStore - Jumbo;Jumbo Shopping Centre;1510;Vantaa;Finland
+1;OneChain;25;OneStore - Leiden;Haarlemmerstraat ;2312;GE Leiden;Holland
+1;OneChain;26;OneStore - Nijmegen ;Broerstraat ;6511;KM Nijmegen;Holland
+1;OneChain;27;OneStore - Väla;Marknadsvägen ;26036;Ödåkra;Sweden
+2;SecondChain;28;2ndStore - Rødovre;Rødovre Centrum ;2610;Rødovre;Denmark
+2;SecondChain;29;2ndStore - Oslo Herre;vej;-1;by;Norway
+2;SecondChain;30;2ndStore - Oslo Pige;vej;-1;by;Norway
+2;SecondChain;31;2ndStore - Kgs. Nytorv;Kgs. Nytorv 
+;1095;København K;Denmark
+2;SecondChain;32;2ndStore - Illum Herre;Illum;1001;København K;Denmark
+2;SecondChain;33;2ndStore - Illum Pige;Illum;1001;København K;Denmark
+2;SecondChain;34;2ndStore - Ros torv;Ro’s Torv Shoppingcenter;4000;Roskilde;Denmark
+2;SecondChain;35;2ndStore - Købmager. Herre;Købmagergade 
+;1150;København;Denmark
+2;SecondChain;36;2ndStore - Købmag. Pige;Købmagergade ;1150;København;Denmark
+2;SecondChain;37;2ndStore - Mood;Mood;11144;Stockholm;Sweden
+2;SecondChain;38;2ndStore - Klostergade;Klostergade ;8000;Aarhus C;Denmark
+2;SecondChain;39;2ndStore - Lyngby;Lyngby Hovedgade 
+;2800;Kgs. Lyngby;Denmark
+2;SecondChain;40;2ndStore - Biblio. Gatan;vej;-1;by;Sweden
+2;SecondChain;41;2ndStore - Novalund;vej;-1;by;Sweden
+2;SecondChain;42;2ndStore - Wolvenstraat;vej;-1;by;Holland
+2;SecondChain;44;2ndStore - Studiestræde;Studiestræde 
+;1455;København K;Denmark
+2;SecondChain;45;2ndStore - Værnedamsvej;Værnedamsvej 
+;1619;København V;Denmark
+2;SecondChain;46;2ndStore - Bruuns;Bruuns Galleri;8000;Aarhus C;Denmark
+2;SecondChain;47;2ndStore - Fields;Fields;2300;København S;Denmark
+2;SecondChain;48;2ndStore - Kolding;Kolding Storcenter;6000;Kolding;Denmark
+2;SecondChain;49;2ndStore - Rosengårdcenter;Rosengårdcentret
+;5220;Odense SØ;Denmark
+2;SecondChain;50;2ndStore - Horsens;Bytorv;8700;Horsens;Denmark
+2;SecondChain;51;2ndStore - Pilestræde;Pilestræde C
+;1112;København K;Denmark
+2;SecondChain;52;2ndStore - Ringsted;Ringsted Outlet;4100;Ringsted;Denmark
+2;SecondChain;53;2ndStore - Vejle;Bryggen;7100;Vejle;Denmark
+2;SecondChain;54;2ndStore - Aalborg Friis;Friis Shoppingcenter;9000;Aalborg;Denmark
+2;SecondChain;55;2ndStore - Vestergade;Vestergade  st. tv
+.;5000;Odense;Denmark
+2;SecondChain;56;2ndStore - Esbjerg;Kongensgade , st. th
+.;6700;Esbjerg;Denmark
+2;SecondChain;57;2ndStore - Aalborg Storcenter;Vej ;-1;by;Denmark
+2;SecondChain;58;2ndStore - Bispensgade;Bispensgade 
+;9000;Aalborg;Denmark
+2;SecondChain;59;2ndStore - BORGEN;Borgen Shopping;6400;Sønderborg;Denmark
+2;SecondChain;60;2ndStore - Frederiksberg;Frederiksberg Centret;2000;Frederiksberg;Denmark
+2;SecondChain;61;2ndStore - Søndergade;Søndergade 
+;8000;Aarhus C;Denmark
+2;SecondChain;62;2ndStore - Bogstadveien;Bogstadveien 
+;355;Oslo;Norway
+2;SecondChain;64;2ndStore - Akerbrygge;Vej ;-1;by;Norway
+2;SecondChain;65;2ndStore - Illum Jeans;Illum;1001;København K;Denmark
+4;ThirdChain;66;3rdStore Pilestræde;Pilestræde A, St. Th
+.;1112;København K;Denmark
+4;ThirdChain;67;3rdStore Vejle;Bryggen;7100;Vejle;Denmark
+4;ThirdChain;68;3rdStore Fields;Fields;2200;København S;Denmark
+4;ThirdChain;69;3rdStore Odense;Kongensgade , st.
+;5000;Odense C;Denmark
+4;ThirdChain;70;3rdStore Aalborg Friis;Friis Shoppingcenter;9000;Aalborg;Denmark
+4;ThirdChain;71;3rdStore Bruuns;Bruuns Galleri;8000;Aarhus C;Denmark
+4;ThirdChain;72;3rdStore Frederiksberg;Frederiksberg Centret;2000;Frederiksberg;Denmark
+4;ThirdChain;73;3rdStore STORE TORV;Store Torv ;8000;Aarhus C;Denmark
+4;ThirdChain;74;3rdStore Amagertorv;Amagertorv ;1160;København K;Denmark
+2;SecondChain;75;2ndStore - Malmø;Södra förstagatan 
+;21143;Malmö;Sweden
+2;SecondChain;76;2ndStore - Emporia;Vej ;-1;by;Sweden
+2;SecondChain;77;2ndStore - Brunogallerian;Vej ;-1;by;Sweden
+2;SecondChain;78;2ndStore - Korsgatan;Korsgatan ;41116;Göteborg;Sweden
+2;SecondChain;79;2ndStore - Amsterdam;Vej ;-1;by;Holland
+2;SecondChain;80;2ndStore - Rotterdam ;Meent a 
+;3011;JD Rotterdam;Holland
+2;SecondChain;88;2ndStore - Slottsgata;vej;-1;by;Norway
+1;OneChain;110;OneStore - Birsta;Birsta City;85753;Sundsvall;Sweden
+1;OneChain;111;OneStore - Borås;Österlånggatan ;50337;Borås;Sweden
+1;OneChain;112;OneStore - Burlöv;Burlöv Center;23237;Arlöv;Sweden
+1;OneChain;113;OneStore - Erikslund;Erikslund Shopping center;72138;Västerås;Sweden
+1;OneChain;114;OneStore - Frölunda;Frölunda Torg ;42142;Göteborg;Sweden
+1;OneChain;115;OneStore - Grand Samarkand;Grand Samarkand Köpcentrum;35246;Växjö;Sweden
+1;OneChain;116;OneStore - Trollhättan;Etage Shopping;46170;Trollhättan;Sweden
+1;OneChain;117;OneStore - Torp;Torp Köpcentrum;45176;Uddevalla;Sweden
+1;OneChain;118;OneStore - Nordby;Nordby Shoppingcenter;45270;Strömstad;Sweden
+1;OneChain;119;OneStore - Kouvola;Veturi Shopping Center;45720;Kouvola;Finland
+1;OneChain;120;OneStore - Ideapark;Ideaparkinkatu ;37570;Lempäälä;Finland
+1;OneChain;121;OneStore - Gunerius;Gunerius Kjøpesenter;184;Oslo;Norway
+1;OneChain;122;OneStore - Linderud;Linderud Senter;594;Oslo;Norway
+1;OneChain;123;OneStore - Tveita;Tveita Senter;671;Oslo;Norway
+1;OneChain;124;OneStore - Liertoppen;Liertoppen Kjøpesenter;3420;Drammen;Norway
+1;OneChain;125;OneStore - Strømmen;Strømmen Storsenter;2010;Strømmen;Norway
+1;OneChain;126;OneStore - Herkules;Herkules Senter;3730;Skien;Norway
+1;OneChain;127;OneStore - Hønefoss;Kuben Kjøpesenter;3510;Hønefoss;Norway
+1;OneChain;128;OneStore - Hamar;CC Stadion Indkøbssenter;2317;hamar;Norway
+1;OneChain;129;OneStore - Jekta;Jekta Storsenter;9015;Tromsø;Norway
+1;OneChain;130;OneStore - Jessheim;Jessheim Storsenter;2050;Jessheim;Norway
+1;OneChain;131;OneStore - Madla;Amfi Madla;4042;Hafrsfjord;Norway
+1;OneChain;132;OneStore - Molde;Amfi Roseby;6415;Molde;Norway
+1;OneChain;133;OneStore - Steinkjær;Amfi Steinkjer;7714;Steinkjer;Norway
+1;OneChain;134;OneStore - Sørlandscenter;Sørlandssenteret;4636;Kristiansand;Norway
+1;OneChain;135;OneStore - Gulskogen;Gulskogen Senter;3048;Drammen;Norway
+1;OneChain;136;OneStore - Sandvika;Sandvika Storsenter;1337;Sandvika;Norway
+1;OneChain;137;OneStore - Sirkus;Sirkus Shopping;7044;Trondheim;Norway
+1;OneChain;138;OneStore - Lagunen;Lagunen Storsenter;5239;Bergen;Norway
+1;OneChain;139;OneStore - Råholt;Amfi Eidsvoll;2070;Råholt;Norway
+1;OneChain;140;OneStore - Sartor;Sartor Storsenter;5353;Straume;Norway
+1;OneChain;142;OneStore - Randers Storcenter;Randers Storcenter;8900;Randers;Denmark
+1;OneChain;143;OneStore - Viborg;Sct. Mathias Centret ;8800;Viborg;Denmark
+1;OneChain;144;OneStore - Silkeborg;Vestergade ;8600;Silkeborg;Denmark
+1;OneChain;145;OneStore - Rosengårdscentret;Rosengårdscentret;5220;Odense SØ;Denmark
+1;OneChain;146;OneStore - Køge;Brogade ;4600;Køge;Denmark
+1;OneChain;147;OneStore - Hundige Storcenter;Waves Shoppingcenter;2670;Greve;Denmark
+1;OneChain;148;OneStore - Horsens Bytorv;Søndergade ;8700;Horsens;Denmark
+1;OneChain;149;OneStore - Aalborg Storcenter;Aalborg Storcenter;9200;Aalborg SV;Denmark
+1;OneChain;150;OneStore - Hjørring;Metropol;9800;Hjørring;Denmark
+1;OneChain;151;OneStore - Holstebro;Nørregade ;7500;Holstebro;Denmark
+1;OneChain;152;OneStore - Valby;Spinderiet;2500;Valby;Denmark
+1;OneChain;153;OneStore - Tarup Center;Tarup Center;5210;Odense NV;Denmark
+1;OneChain;154;OneStore - Herning Centret;Herning Centret;7400;Herning;Denmark
+1;OneChain;155;OneStore - Kolding Storcenter;Kolding Storcenter;6000;Kolding;Denmark
+1;OneChain;156;OneStore - Lyngby;Lyngby Storcenter ;2800;Kgs. Lyngby;Denmark
+1;OneChain;157;OneStore - Vejle;Torvegade ;7100;Vejle;Denmark
+1;OneChain;158;OneStore - Randers City;Sct. Mortensgade ;8900;Randers;Denmark
+1;OneChain;159;OneStore - Odense City;Kongensgade  st. tv.;5000;Odense C;Denmark
+1;OneChain;160;OneStore - Varde;Kræmmergade  st.;6800;Varde;Denmark
+1;OneChain;161;OneStore - Sønderborg;Kastanie Álle ;6400;Sønderborg;Denmark
+1;OneChain;162;OneStore - Ryesgade;Ryesgade ;8000;Aarhus C;Denmark
+1;OneChain;163;OneStore - Svendborg;Gerritsgade ;5700;Svendborg;Denmark
+1;OneChain;164;OneStore - Østerbrogade;Østerbrogade ;2100;København;Denmark
+1;OneChain;166;OneStore - Amersfoort;Langestraat ;3811;AC Amersfoort;Holland
+1;OneChain;167;OneStore - Delft;Paradijspoort -;2611;MB Delft;Holland
+1;OneChain;168;OneStore - Den Bosch;De Arena;5211;XT 's-Hertogenbosch;Holland
+1;OneChain;170;OneStore - Kvadrat;Kvadrat, Gamle Stokkavei ;4313;Sandnes;Norway
+1;OneChain;180;OneStore - M44;M Kjøpesenter, Jupiterveien ;4340;Bryne;Norway
+1;OneChain;181;OneStore - Moa;Amfi Moa, Langelandsveien ;6010;Ålesund;Norway
+1;OneChain;182;OneStore - Østfolhallen;Dikeveien , Frederikstad;1661;Rolvsøy;Norway
+1;OneChain;183;OneStore - Skanderborg;Bloms Butikker, Adelgade -;8660;Skanderborg;Denmark
+1;OneChain;185;OneStore - Ribe;Nederdammen  C;6760;Ribe;Denmark
+2;SecondChain;247;2ndStore - Lyngby Torv;Lyngby Hovedgade ;2800;Kgs. Lyngby;Denmark
+2;SecondChain;248;2ndStore - Helsinki;x;-1;x;Finland
+2;SecondChain;250;2ndStore - Bikini Berlin;x;-1;x;Germany
+2;SecondChain;332;2ndStore - Trondheim;Trondheim;-1;Trondheim;Norway
+2;ThirdChain;333;3rdStore - Oslo;Oslo;-1;Oslo;Norway
+1;OneChain;349;OneStore - Farum;Farum Bytorv;3520;Farum;Denmark
+2;SecondChain;360;2ndStore - Outlet Barkarby;Outlet Barkarby;17738;Outlet Barkarby;Sweden
+1;OneChain;362;OneStore - Lillehammer;Strandtorget Indkøbssenter;2609;Lillehammer;Norway
+1;OneChain;363;OneStore - Stovner;Stovner Senter;985;Oslo;Norway
+1;OneChain;364;OneStore - Sello;Sello Shopping Mall;2600;Espoo;Finland
+2;ThirdChain;418;3rdStore Amsterdam;Hartenstraat ;0;BZ Amsterdam;Holland
+2;SecondChain;421;2ndStore - Berlin Mitte;Mitte;0;Berlin;Germany
+1;OneChain;436;OneStore - Aalborg City;Bredegade ;0;Aalborg;Denmark
+2;SecondChain;451;2ndStore - Samsoe.com;Webshop;0;Kbh;Denmark
+1;OneChain;455;OneStore - Haarlem;Grote Houtstraat ;0;SR Haarlem;Holland
+1;OneChain;459;OneStore - Kotka;Keskuskatu ;48100;Kotka;Finland
+1;OneChain;460;OneStore - Hillerød;Slotsgade ;0;Hillerød;Denmark
+1;OneChain;466;OneStore - Enschede;Klanderij ;0;HS Enschede;Holland
+1;OneChain;469;OneStore - Ski;Ski Storsenter;0;Ski;Norway
+1;OneChain;471;OneStore - Tønsberg ;Farmandstredet Shopping Senter;0;Tønsberg;Norway
+1;OneChain;472;OneStore - Oasen;Austbøvegen ;0;Karmsund;Norway
+1;OneChain;474;OneStore - Larvik;Nordbyen Shopping;0;Larvik;Norway
+1;OneChain;475;OneStore - Kuopio;Matkuksentie ;0;Kuopio;Finland
+
+(157 rows affected)
+
