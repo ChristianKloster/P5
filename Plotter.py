@@ -13,8 +13,8 @@ class Plotter:
         #Parametre til metadata
         firstdate = dataframe['date'].iloc[0]
         lastdate = dataframe['date'].iloc[dataframe.ndim]
-        retailer = dataframe['retailerId'].iloc[1]
-        product = dataframe['productId'].iloc[1]
+        retailer = dataframe['retailerId'].iloc[0]
+        product = dataframe['productId'].iloc[0]
         #Sortering og plot
         dataframe = dataframe.groupby(by='date').sum(axis='Quantity', numeric_only=True)
         dataframe.plot(y='Quantity')
