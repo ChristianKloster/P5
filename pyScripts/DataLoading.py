@@ -16,7 +16,7 @@ def loadSalesFile(filePath):
 								names=[
 									'date', 
 									'supplierID', 
-									'retialerID', 
+									'retailerID', 
 									'supplierItemgroupID', 
 									'SupplierItemgroupName', 
 									'productID',
