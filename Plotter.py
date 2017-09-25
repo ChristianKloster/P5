@@ -1,27 +1,21 @@
-import pandas as pandas
 import matplotlib.pyplot as plt
 import Meta as mt
 
+def plc(dataframe, name, ret, prod):
 
-class Plotter:
-
-    def plc(dataframe, name):
         #Bliver ordnet før denne metode, lige nu er det her til at lave test data
-        dataframe = dataframe.dropna(axis=0, how='any')
-        dataframe = dataframe.query("retailerId == 10")
-        dataframe = dataframe.query("productId == 10024")
+        dataframe = dataframe.query("retailerID == @ret")
+        dataframe = dataframe.query("productID == @prod")
         #Parametre til metadata
-        firstdate = dataframe['date'].iloc[0]
-        lastdate = dataframe['date'].iloc[dataframe.ndim]
-        retailer = dataframe['retailerId'].iloc[0]
-        product = dataframe['productId'].iloc[0]
+        # firstdate = dataframe['date'].iloc[0]
+        # lastdate = dataframe['date'].iloc[-1]
+        # retailer = str(dataframe['retailerID'].iloc[0])
+        # product = str(dataframe['productID'].iloc[0])
         #Sortering og plot
-        dataframe = dataframe.groupby(by='date').sum(axis='Quantity', numeric_only=True)
-        dataframe.plot(y='Quantity')
+        dataframe = dataframe.groupby(by='date').sum(axis='quantity', numeric_only=True)
+        dataframe.plot(y='quantity', style='.')
         #Gemmer lige nu til png fordi vi gerne vil have metadata, men pdf er bedre til brug i rapporten
         plt.savefig('%s.png' %name)
-        #Viser plottet i en popup fra PyCharm
-        plt.show()
         #Kalder metadata metoden og tilføjer info
-        mt.addMetaData('%s.png' %name, { 'from':firstdate, 'to':lastdate,
-                                         'retailer':retailer, 'product':product})
+        # mt.addMetaData('%s.png' %name, {'from':firstdate, 'to':lastdate,
+        #                                  'retailer':retailer, 'product':product})
