@@ -1,12 +1,14 @@
 import pandas as pd
 import numpy as np
 
+# returns single dataframe containing data from multiple files
 def loadSalesFiles(listOfSalesFiles):
 	df = pd.DataFrame()
 	for file in listOfSalesFiles:
 		df = df.append(loadSalesFile(file))
 	return df
 
+# dataframe from singe file with type checking and naming
 def loadSalesFile(filePath):
 	return pd.read_csv(filePath, encoding='utf-8',
 								sep=';', 
@@ -45,13 +47,13 @@ def loadSalesFile(filePath):
 
 # ad hoc testing:
 
-directory = 'C:/Users/nicol/Desktop/AAU/Sales_20'
-files = ['1608', '1609','1610']
-end = '.rpt'
+# directory = 'C:/Users/nicol/Desktop/AAU/Sales_20'
+# files = ['1608', '1609','1610']
+# end = '.rpt'
 
-for x in range(0,len(files)):
-	files[x] = directory + files[x] + end
+# for x in range(0,len(files)):
+# 	files[x] = directory + files[x] + end
 
-d = loadSalesFiles(files)
+# d = loadSalesFiles(files)
 
-print(d['description'].value_counts())
+# print(d['description'].value_counts())
