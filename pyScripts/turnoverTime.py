@@ -44,38 +44,53 @@ def loadSalesFile(filePath):
 									'turnover':np.float64,
 									'discount':np.float64})
 
-# ad hoc testing:
-#C:\Users\SorenM\Documents\GitHub\P5\GOFACT_DATA
-directory = 'C:/Users/SorenM/Documents/GitHub/P5/GOFACT_DATA/Sales_20'
-files = []
-for r in range(1606,1612):
-	files.append('%04i' % r)
-
-for r in range(1701,1709):
-	files.append('%04i' % r)
-
-end = '.rpt'
-
-for x in range(0,len(files)):
-	files[x] = directory + files[x] + end
-
-d = loadSalesFiles(files)
-
-col_list = ["turnover", "date", "productID"]
-d = d[col_list]
-x=d["date"]
-y=d["turnover"]
-#d= d[(d.turnover > 5) & (d.turnover < 0)]
-#print(d)
-#print(d['description'].value_counts())
-
-N=10000
+#Returns the moving average of x with the average made over N points
 def runningMeanFast(x, N):
     return np.convolve(x, np.ones((N,))/N)[(N-1):]
 
-d=pd.DataFrame(runningMeanFast(y,N))
-y=d
+#Returns the dataframe containing all sales information from periods ym1_1 to ym1_2 and ym2_1 to ym2_2
+# (ym stands for year/month)
+def createDataframe(filepath, ym1_1, ym1_2, ym2_1, ym2_2):
+	df = pd.DataFrame()
+	files = []
+	for r in range(ym1_1, ym1_2):
+		files.append('%04i' % r)
 
-plt.plot(x,d)
+	for r in range(ym2_1, ym2_2):
+		files.append('%04i' % r)
+
+	end = '.rpt'
+
+	for x in range(0, len(files)):
+		files[x] = filepath + files[x] + end
+	df = loadSalesFiles(files)
+	return df
+
+#Returns a DF containing only relevant collumns
+def col_listOfDF(filepath, ym1_1, ym1_2, ym2_1, ym2_2):
+	df=createDataframe(filepath, ym1_1, ym1_2, ym2_1, ym2_2)
+	col_list = ["turnover", "date"]
+	df = df[col_list]
+	return df
+
+#Creates a plot of the turnover over a given period of time on which
+# the moving average (of x with the average made over N points) was performed on
+def createPlot_TurnoverOverTime(filepath, ym1_1, ym1_2, ym2_1, ym2_2, N):
+	df=col_listOfDF(filepath, ym1_1, ym1_2, ym2_1, ym2_2)
+	x=df["date"]
+	y=df["turnover"]
+	#d= d[(d.turnover > 5) & (d.turnover < 0)]
+	#print(d)
+	#print(d['description'].value_counts())
+
+	newY=pd.DataFrame(runningMeanFast(y, N))		#Moving average of turnover
+
+	plt.plot(x,newY)
+
+N=20000
+createPlot_TurnoverOverTime('C:/Users/SM-Baerbar/Documents/AAU/Semester 5/P5/P5/GOFACT_DATA/Sales_20', 1606, 1613, 1701,
+							1710, N)
 plt.show()
 #plt.savefig('%s.png' %"test")
+
+
