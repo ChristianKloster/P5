@@ -11,7 +11,8 @@ raw_data ={
 	'yellow':   [6,12,18,24,30,36],
 	'purple':   [7,14,21,28,35,42],
 }
-
+#Metode der modtager laver et diagram som viser fordelingen af salget over farver og størrelser hos en enkelt vare.
+#Metoden modtager et input data og et navn. Dataen skal også indeholde "row keys" som bliver farven på søjlen.
 def histogram(inputdata, styleName):
 	df = pd.DataFrame(OrderedDict(inputdata),index=pd.Index(['size1', 'size2', 'size3', 'size4', 'size5', 'size6'], name=styleName))
 	df.plot(kind='bar', color=(inputdata.keys()), edgecolor ='black')
