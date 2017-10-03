@@ -3,6 +3,7 @@ import pandas as pd
 from Plotter import plc as plc
 import matplotlib.pyplot as plt
 
+#Generere en liste af transactions fra suppleret retailer og kigger på en defineret top % af dem, de grupperes efter generer_fra
 def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest = 20):
     d = dl.loadSalesFiles(files)
     d = d.dropna(axis=0, how='any')
@@ -20,6 +21,7 @@ def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest 
         tilPLC = d[d[generer_fra] == a[a == x].index[0]]
         plc(tilPLC, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, tilPLC['styleNumber'].iloc[0]))
 
+    #Tager et productID eller et stylenumber og udprinter information om varen
 def productreturn(id, stylenumber = 1):
     d = dl.loadSalesFiles(files)
     if stylenumber:
