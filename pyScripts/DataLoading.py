@@ -2,25 +2,25 @@ import pandas as pd
 import numpy as np
 
 # returns single dataframe containing data from multiple files
-def loadSalesFiles(listOfSalesFiles):
+def load_sales_files(listOfSalesFiles):
 	df = pd.DataFrame()
 	for file in listOfSalesFiles:
 		df = df.append(loadSalesFile(file))
 	return df
 
 # dataframe from singe file with type checking and naming
-def loadSalesFile(filePath):
+def load_salesfile(filePath):
 	return pd.read_csv(filePath, encoding='utf-8',
-								sep=';', 
+								sep=';',
 								parse_dates=[0], # parse first column
 								skiprows=1, # skip header
 								comment='(', # ignore the '(n rows affected)' footer
 								names=[
-									'date', 
-									'supplierID', 
-									'retailerID', 
-									'supplierItemgroupID', 
-									'SupplierItemgroupName', 
+									'date',
+									'supplierID',
+									'retailerID',
+									'supplierItemgroupID',
+									'SupplierItemgroupName',
 									'productID',
 									'styleNumber',
 									'description',
@@ -31,10 +31,10 @@ def loadSalesFile(filePath):
 									'turnover',
 									'discount' ],
 								dtype={
-									'supplierID':np.int64, 
-									'retialerID':np.int64, 
-									'supplierItemgroupID':np.int64, 
-									'SupplierItemgroupName':np.str_, 
+									'supplierID':np.int64,
+									'retialerID':np.int64,
+									'supplierItemgroupID':np.int64,
+									'SupplierItemgroupName':np.str_,
 									'productID':np.int64,
 									'styleNumber':np.str_,
 									'description':np.str_,

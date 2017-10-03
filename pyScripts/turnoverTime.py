@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import dataloader as dl
 
+'''
 def load_salesfiles(listOfSalesFiles):
     df = pd.DataFrame()
     for file in listOfSalesFiles:
@@ -44,7 +46,7 @@ def load_salesfile(filePath):
                            'quantity': np.int64,
                            'turnover': np.float64,
                            'discount': np.float64})
-
+'''
 
 # Returns the moving average of x with the average made over N points
 def running_mean(x, N):
@@ -54,7 +56,6 @@ def running_mean(x, N):
 # Returns the dataframe containing all sales information from periods ym1_1 to ym1_2 and ym2_1 to ym2_2
 # (ym stands for year/month)
 def create_dataframe(filepath, ym1_1, ym1_2, ym2_1, ym2_2):
-    df = pd.DataFrame()
     files = []
     for r in range(ym1_1, ym1_2):
         files.append('%04i' % r)
@@ -66,7 +67,7 @@ def create_dataframe(filepath, ym1_1, ym1_2, ym2_1, ym2_2):
 
     for x in range(0, len(files)):
         files[x] = filepath + files[x] + end
-    df = load_salesfiles(files)
+    df = dl.load_salesfiles(files)
     return df
 
 
@@ -88,7 +89,6 @@ def plot_turnover_over_time(filepath, ym1_1, ym1_2, ym2_1, ym2_2, N):
     newY = pd.DataFrame(running_mean(y, N))  # Moving average of turnover
 
     plt.plot(x, newY)
-
 
 N = 20000
 plot_turnover_over_time('C:/Users/SM-Baerbar/Documents/AAU/Semester 5/P5/P5/GOFACT_DATA/Sales_20', 1606, 1613, 1701,

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 #Generere en liste af transactions fra suppleret retailer og kigger på en defineret top % af dem, de grupperes efter generer_fra
 def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest = 20):
-    d = dl.loadSalesFiles(files)
+    d = dl.load_sales_files(files)
     d = d.dropna(axis=0, how='any')
     d = d[d.isNOS != 1]
     if retailer != 'alle':
@@ -23,7 +23,7 @@ def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest 
 
     #Tager et productID eller et stylenumber og udprinter information om varen
 def productreturn(id, stylenumber = 1):
-    d = dl.loadSalesFiles(files)
+    d = dl.load_sales_files(files)
     if stylenumber:
         d = d[d.styleNumber == id]
         print(d['colorname'].value_counts())
