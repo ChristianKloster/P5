@@ -1,4 +1,4 @@
-from DataLoading import loadAllSales
+from dataloader import load_sales_files
 import matplotlib.pyplot as plt
 
 def plc(dataframe, name, ret, prod):
