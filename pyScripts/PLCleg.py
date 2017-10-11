@@ -1,4 +1,4 @@
-import DataLoad as dl
+import dataloader as dl
 import pandas as pd
 from Plotter import plc as plc
 import matplotlib.pyplot as plt

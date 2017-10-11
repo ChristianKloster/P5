@@ -5,11 +5,11 @@ import numpy as np
 def load_sales_files(listOfSalesFiles):
 	df = pd.DataFrame()
 	for file in listOfSalesFiles:
-		df = df.append(loadSalesFile(file))
+		df = df.append(load_sales_file(file))
 	return df
 
 # dataframe from singe file with type checking and naming
-def load_salesfile(filePath):
+def load_sales_file(filePath):
 	return pd.read_csv(filePath, encoding='utf-8',
 								sep=';',
 								parse_dates=[0], # parse first column
@@ -44,6 +44,27 @@ def load_salesfile(filePath):
 									'quantity':np.int64,
 									'turnover':np.float64,
 									'discount':np.float64})
+
+# Returns the dataframe containing all sales information from periods ym1_1 to ym1_2 and ym2_1 to ym2_2
+# (ym stands for year/month)
+def load_sales_files_ranges(filepath, ym1_1, ym1_2, ym2_1, ym2_2):
+    files = []
+    for r in range(ym1_1, ym1_2):
+        files.append('%04i' % r)
+
+    for r in range(ym2_1, ym2_2):
+        files.append('%04i' % r)
+
+    end = '.rpt'
+
+    for x in range(0, len(files)):
+        files[x] = filepath + files[x] + end
+    df = load_sales_files(files)
+    return df
+
+def get_columns(df, columns):
+    df = df[columns]
+    return df
 
 # ad hoc testing:
 
