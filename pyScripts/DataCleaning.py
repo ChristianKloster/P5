@@ -3,9 +3,6 @@ import numpy as np
 
 directory = 'C:/git repo/P5/GOFACT_DATA/Sales_201612.rpt'
 
-fyfy_Ord = ['Dummy','MEN - BASIC - DON\'T USE','WOMEN - BASIC - DON\'T USE'] #Mangler ord?
-#test = [] #For testing
-
 #Dataloader
 df = pd.read_csv(directory, encoding='utf-8',
 								sep=';',
@@ -42,15 +39,20 @@ df = pd.read_csv(directory, encoding='utf-8',
 									'turnover':np.float64,
 									'discount':np.float64})
 
+
 def datacleaner(df, parameter, words): #Can handle 0, one or more words. 0 Returns the same dataframe.
-    banned_Words = [].append(words) #converts input to list, even if it already is a list
-    if banned_Words: #False if the list is empty, true if not
-        for word in banned_Words:
-            df[df.parameter != word] #Keeps rows where paramter isn't word.
+    if len(words) > 1:
+        for word in words:
+            df = df[df[parameter] != word]#Keeps rows where paramter isn't word.
+
+    if len(words) == 1:
+        df = df[df[parameter] != words[0]]
+
+    else:
+        print('Didn\'t do nothing')
     return df
 
-#datacleaner(df, 'ItemGroupName', fyfy_Ord)
-datacleaner(df, 'ItemGroupName', fyfy_Ord).to_csv(path_or_buf=r'C:\Users\TheChamp\Desktop\out\file.txt') #To ensure they were removed from the dataframe
+datacleaner(df, 'SupplierItemgroupName', ['Dummy']).to_csv(path_or_buf=r'C:\Users\TheChamp\Desktop\out\file.txt') #To ensure they were removed from the dataframe
 
 
 
