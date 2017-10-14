@@ -40,11 +40,12 @@ df = pd.read_csv(directory, encoding='utf-8',
 									'discount':np.float64})
 
 
-
+#This method opens the meta file and notes which data has been removed.
 def metawriter(parameter, word, path):
 	with open(path + 'meta.txt', "a") as myfile:
          myfile.write(parameter +': '+ word)
 
+#df: unclean data. parameter: Columntype. words: Entries you want to filter out. path: The path to the cleandata folder in your git folder.
 def datacleaner(df, parameter, words, path): #Can handle 0, one or more words. 0 Returns the same dataframe.
     if len(words) > 1:
         for word in words:
