@@ -10,11 +10,19 @@ class retailerData:
 	# returns int chainid
 	def get_chainnumber_from_retailerid(self, id):
 		s = self.df[self.df.id == id]
-		return s['chainid'].get_value(0)
+		return s['chainid'].get_value(s.first_valid_index())
+
+	def get_region_from_retailerid(self, id):
+		s = self.df[self.df.id == id]
+		return s['region'].get_value(s.first_valid_index())
 
 	# takes string (case sensitive) returns dataframe
 	def get_retailers_from_country(self, country):
 		return self.df[self.df.country == country]
+
+	# takes string (case sensitive) returns dataframe
+	def get_retailers_from_region(self, region):
+		return self.df[self.df.region == region]
 
 	# returns dataframe
 	def get_retailers_from_chainid(self, id):
