@@ -40,19 +40,24 @@ df = pd.read_csv(directory, encoding='utf-8',
 									'discount':np.float64})
 
 
-def datacleaner(df, parameter, words): #Can handle 0, one or more words. 0 Returns the same dataframe.
+
+def metawriter(parameter, word, path):
+	with open(path + 'meta.txt', "a") as myfile:
+         myfile.write(parameter +': '+ word)
+
+def datacleaner(df, parameter, words, path): #Can handle 0, one or more words. 0 Returns the same dataframe.
     if len(words) > 1:
         for word in words:
             df = df[df[parameter] != word]#Keeps rows where paramter isn't word.
-
+            metawriter(parameter, word, path)
     if len(words) == 1:
         df = df[df[parameter] != words[0]]
-
+        metawriter(parameter, words[0], path)
     else:
         print('Didn\'t do nothing')
-    return df
 
-datacleaner(df, 'SupplierItemgroupName', ['Dummy']).to_csv(path_or_buf=r'C:\Users\TheChamp\Desktop\out\file.txt') #To ensure they were removed from the dataframe
+    df.to_csv(path_or_buf=path+'CleanedData.txt', index = False)
 
+datacleaner(df, 'SupplierItemgroupName', ['Dummy'], r'C:\Git repo\P5\CleanData\\') #To ensure they were removed from the dataframe
 
 
