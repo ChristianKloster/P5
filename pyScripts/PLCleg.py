@@ -1,19 +1,25 @@
 import dataloader as dl
+from retailerdata import retailerData as rd
 import pandas as pd
 from Plotter import plc as plc
 import matplotlib.pyplot as plt
 
 #Generere en liste af transactions fra suppleret retailer og kigger på en defineret top % af dem, de grupperes efter generer_fra
 def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest = 20):
+    rddf = rd('C:/Users/SM-Baerbar/Documents/GitHub/P5/GOFACT_DATA/retailers.rpt')
+    dDanish = rddf.get_retailers_from_country('Denmark')
+    dRegion = rddf.get_retailers_from_region('')
+
     d = dl.load_sales_files(files)
     d = d.dropna(axis=0, how='any')
     d = d[d.isNOS != 1]
+    #d = d[d.retailerID.isin(df.id)] #Kun danske butikker
     #d = d[d.SupplierItemgroupName == 'MEN - JEANS']
     if retailer != 'alle':
         d = d[d.retailerID == retailer]
 
     #Plotter for alle produkter i én graf
-    #plc(d, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, 'all'))
+    plc(d, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, 'all'))
     # Laver en sorteret liste sorteret efter mængde forekomster
     a = d[generer_fra].value_counts()
     # Summere og har med overPercentDesc mulighed for at give en procentvis grænse for hvor stor en del af salget

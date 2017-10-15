@@ -44,6 +44,7 @@ def plc(dataframe, name, retailer = 0, product = 0, ignore_returns = 1):
         directory = os.path.dirname(name)
         if not os.path.exists(directory):
                 os.makedirs(directory)
+        plt.tight_layout()
         plt.savefig('%s.png' % name)
         # mt.addMetaData('%s.png' %name, {'from':firstdate, 'to':lastdate,
         #                                  'retailer':retailer, 'product':product})
