@@ -13,13 +13,14 @@ def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest 
     d = dl.load_sales_files(files)
     d = d.dropna(axis=0, how='any')
     d = d[d.isNOS != 1]
-    #d = d[d.retailerID.isin(d_region.id)]
+    #d = d[d.retailerID.isin(d_danish.id)] #Kun danske butikke
+    # d = d[d.retailerID.isin(d_region.id)] #Kun butikker i bestemt region
     #d = d[d.SupplierItemgroupName == 'MEN - JEANS']
     if retailer != 'alle':
         d = d[d.retailerID == retailer]
 
     #Plotter for alle produkter i én graf
-    plc(d, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, '_sjaelland'))
+    plc(d, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, 'all'))
     # Laver en sorteret liste sorteret efter mængde forekomster
     a = d[generer_fra].value_counts()
     # Summere og har med overPercentDesc mulighed for at give en procentvis grænse for hvor stor en del af salget
