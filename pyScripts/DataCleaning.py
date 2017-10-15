@@ -3,8 +3,6 @@ import numpy as np
 
 directory = 'C:/git repo/P5/GOFACT_DATA/Sales_201612.rpt'
 
-banned_Words = ['Dummy','MEN - BASIC - DON\'T USE','WOMEN - BASIC - DON\'T USE'] #Tilføj ord?
-
 #Dataloader
 df = pd.read_csv(directory, encoding='utf-8',
 								sep=';',
@@ -41,7 +39,26 @@ df = pd.read_csv(directory, encoding='utf-8',
 									'turnover':np.float64,
 									'discount':np.float64})
 
-for word in banned_Words:
-    df = df[df.SupplierItemgroupName != word]
 
-df.to_csv(path_or_buf=r'C:\Users\TheChamp\Desktop\out\file.txt') #To ensure they were removed from the dataframe
+#This method opens the meta file and notes which data has been removed.
+def metawriter(parameter, word, path):
+	with open(path + 'meta.txt', "a") as myfile:
+         myfile.write(parameter +': '+ word)
+
+#df: unclean data. parameter: Columntype. words: Entries you want to filter out. path: The path to the cleandata folder in your git folder.
+def datacleaner(df, parameter, words, path): #Can handle 0, one or more words. 0 Returns the same dataframe.
+    if len(words) > 1:
+        for word in words:
+            df = df[df[parameter] != word]#Keeps rows where paramter isn't word.
+            metawriter(parameter, word, path)
+    if len(words) == 1:
+        df = df[df[parameter] != words[0]]
+        metawriter(parameter, words[0], path)
+    else:
+        print('Didn\'t do nothing')
+
+    df.to_csv(path_or_buf=path+'CleanedData.txt', index = False)
+
+datacleaner(df, 'SupplierItemgroupName', ['Dummy'], r'C:\Git repo\P5\CleanData\\') #To ensure they were removed from the dataframe
+
+
