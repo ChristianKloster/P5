@@ -8,9 +8,12 @@ def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest 
     d = dl.load_sales_files(files)
     d = d.dropna(axis=0, how='any')
     d = d[d.isNOS != 1]
+    #d = d[d.SupplierItemgroupName == 'MEN - JEANS']
     if retailer != 'alle':
         d = d[d.retailerID == retailer]
 
+    #Plotter for alle produkter i én graf
+    #plc(d, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, 'all'))
     # Laver en sorteret liste sorteret efter mængde forekomster
     a = d[generer_fra].value_counts()
     # Summere og har med overPercentDesc mulighed for at give en procentvis grænse for hvor stor en del af salget
@@ -33,8 +36,7 @@ def productreturn(id, stylenumber = 1):
     print(d.SupplierItemgroupName.iloc[0])
     print(d.description.iloc[0])
 
-
-directory = 'C:/Users/Patrick/PycharmProjects/untitled/AAU/Sales_20'
+directory = 'C:/Users/SM-Baerbar/Documents/GitHub/P5/GOFACT_DATA/Sales_20'
 files = ['1606', '1607', '1608', '1609','1610', '1611', '1612',
          '1701', '1702', '1703', '1704', '1705', '1706' , '1707', '1708', '1709']
 end = '.rpt'
@@ -44,6 +46,6 @@ for x in range(0,len(files)):
 
 # plotplc(3, generer_fra = 'description', percent_of_interest=20)
 # plotplc(42, generer_fra = 'description', percent_of_interest=20)
-plotplc(42, generer_fra = 'SupplierItemgroupName', percent_of_interest=20)
+plotplc('alle', percent_of_interest=30)
 
 # print(productreturn('F14307084', 1))

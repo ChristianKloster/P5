@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
-import Meta as mt
+#import meta as mt
 import numpy as np
 from datetime import timedelta
 
@@ -26,20 +26,20 @@ def plc(dataframe, name, retailer = 0, product = 0, ignore_returns = 1):
         #Den brokker sig pt over denne linje, når der er fundet ud af hvorfor og der er fixet slet denne kommentar :D
         dataframe['discountP'] = (- dataframe['discount'] ) / (dataframe['turnover'] - dataframe['discount']) * 100
         dataframe_discount = dataframe.groupby(by='date').mean()
-        dataframe_turnover = dataframe.groupby(by='date').mean()
+        dataframe_turnover = dataframe.groupby(by='date').sum()
 
         #Sammensætter en ny dataframe kun med dem vi er interesserede i
         dataframe_plot = pd.concat([dataframe_quantity['quantity'], dataframe_discount['discountP'], dataframe_turnover['turnover']],
                                    axis = 1, keys = ['quantity', 'discount', 'turnover'])
         #Fungere ligesom groupby, men med en bestemt frekvens 4D = 4 dage, W = week
 
-        dataframe_weekly = dataframe_plot.resample('W').agg({'quantity' : 'sum', 'discount' : 'mean', 'turnover' : 'mean'})
-        dataframe_weekly.plot(style='.')
+        dataframe_weekly = dataframe_plot.resample('W').agg({'quantity' : 'sum', 'turnover' : 'sum'})
+        dataframe_weekly.plot()
         #Udkommenteret mulighed for at lave 2 y akser, jeg syntes det virkede mere uoverskueligt
-        # plt.figure()
-        # ax = dataframe_weekly.plot(secondary_y=['discount', 'turnover'], style='.')
-        # ax.set_ylabel('quantity')
-        # ax.right_ax.set_ylabel('Percent discount, turnover')
+        plt.figure()
+        ax = dataframe_weekly.plot(secondary_y=['turnover'])
+        ax.set_ylabel('quantity')
+        ax.right_ax.set_ylabel('turnover')
         #Tjekker for mappen, hvis den ikke findes oprettes den
         directory = os.path.dirname(name)
         if not os.path.exists(directory):
