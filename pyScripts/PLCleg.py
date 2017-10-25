@@ -13,6 +13,7 @@ def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest 
     d = dl.load_sales_files(files)
     d = d.dropna(axis=0, how='any')
     d = d[d.isNOS != 1]
+    #d = d[d.date.dt.day <=7]
     #d = d[d.retailerID.isin(d_danish.id)] #Kun danske butikke
     # d = d[d.retailerID.isin(d_region.id)] #Kun butikker i bestemt region
     #d = d[d.SupplierItemgroupName == 'MEN - JEANS']
@@ -53,6 +54,6 @@ for x in range(0,len(files)):
 
 # plotplc(3, generer_fra = 'description', percent_of_interest=20)
 # plotplc(42, generer_fra = 'description', percent_of_interest=20)
-plotplc('alle', percent_of_interest=30)
+plotplc('alle', percent_of_interest=100)
 
 # print(productreturn('F14307084', 1))
