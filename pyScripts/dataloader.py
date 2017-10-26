@@ -66,6 +66,16 @@ def get_columns(df, columns):
     df = df[columns]
     return df
 
+files = ['1606', '1607', '1608', '1609','1610', '1611', '1612',
+         '1701', '1702', '1703', '1704', '1705', '1706' , '1707', '1708', '1709']
+end = '.rpt'
+
+def get_all_files(direc):
+	output = []
+	for file in files:
+		output.append(direc + file + end)
+	return output
+
 # ad hoc testing:
 
 # directory = 'C:/Users/nicol/Desktop/AAU/Sales_20'
