@@ -11,8 +11,8 @@ df = dl.load_sales_file(r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\
 
 #This method opens the meta file and notes which data has been removed.
 def meta_writer(parameter, word, path):
-	with open(path + 'meta.txt', "a") as myfile:
-         myfile.write(parameter +': '+ str(word) + '\n')
+    with open(path + 'meta.txt', "a") as myfile:
+        myfile.write(parameter +': '+ str(word) + '\n')
 
 #df: unclean data. parameter: Columntype. words: Entries you want to filter out. path: The path to the cleandata folder in your git folder.
 def data_cleaner(df, parameter, words, path): #Can handle 0, one or more words. 0 Returns the same dataframe.
@@ -28,7 +28,13 @@ def data_cleaner(df, parameter, words, path): #Can handle 0, one or more words. 
 
     df.to_csv(path_or_buf=path+'CleanedData.rpt', index = False, sep=';',encoding='utf-8')
 
+DisList = df['quantity'].tolist()
+DisList.sort()
+print(DisList[len(DisList)-5])
 
+
+#ALREADY CALLED:
+#data_cleaner(df, 'quantity', [400,-400], r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\')
 
 #rddf = rd(r'C:\Users\Christian\Desktop\Min Git mappe\P5\Retailers_w_coords.rpt')
 #retailerID = rddf.get_retailers_from_country('Denmark')

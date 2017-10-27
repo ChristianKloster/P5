@@ -78,3 +78,5 @@ retailerID: 349
 retailerID: 436
 retailerID: 451
 retailerID: 460
+quantity: 400
+quantity: -400
