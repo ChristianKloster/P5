@@ -3,42 +3,69 @@ import matplotlib.pyplot as plt
 import dataloader as dl
 from collections import OrderedDict
 from retailerdata import retailerData as rd
+import os
+import sys
 
-
-def filter_data(df):
-	d = df.dropna(axis=0, how='any')
-	d = d[d.isNOS != 1]	#Ignorer NOS varer
-	d = d[(d.date.dt.month != 12) & (d.date.dt.month != 1)]	#ignorer December og Januar
-
-	rddf = rd('C:/Users/SM-Baerbar/Documents/GitHub/P5/Retailers_w_coords.rpt')
-	df_danish = rddf.get_retailers_from_country('Denmark')
-	d = d[d.retailerID.isin(df_danish.id)]  # Kun danske butikker
-	return d
-
-def between_days_sum(start_date, end_date):
-	d = df[(df.date.dt.day >= start_date) & (df.date.dt.day <=end_date)]
-	return d.turnover.sum()
+def between_days_sum(df, start_date, end_date):
+    d = df[(df.date.dt.day >= start_date) & (df.date.dt.day <=end_date)]
+    return d.turnover.sum()
 
 #Metode der modtager laver et diagram som viser fordelingen af salget over farver og størrelser hos en enkelt vare.
 #Metoden modtager et input data og et navn. Dataen skal også indeholde "row keys" som bliver farven på søjlen.
-def histogram(inputdata, styleName):
-	df = pd.DataFrame(OrderedDict(inputdata),index=pd.Index([''], name=styleName))
-	colors = ['black', 'white', 'blue', 'red']
-	x = df.plot(kind='bar', color=(colors), edgecolor ='black')
-	x.set_ylabel('Turnover')
-	plt.tight_layout()
-	plt.show()
+def histogram(inputdata, titl, xlabel, ylabel):
+    df = pd.DataFrame(inputdata, index=list(range(1,32)))
+    colors = ['blue']
+    x = df.plot(kind='bar', color=colors, edgecolor='black', title=titl)
+    x.set_xlabel(xlabel)
+    x.set_ylabel(ylabel)
+    x.legend([xlabel])
+    plt.tight_layout()
 
-df = dl.load_sales_files_ranges('C:/Users/SM-Baerbar/Documents/GitHub/P5/GOFACT_DATA/Sales_20', 1606, 1613, 1701, 1710)
-df = filter_data(df)
+def plot_per_day(dataframe, unit, year, month_is_specific = False):
+    df = dataframe
+    raw_data = []
 
-raw_data ={
-	'days 1-8':    [(between_days_sum(1, 8)/8)],
-	'days 8-15':    [(between_days_sum(8, 15)/8)],
-	'days 16-23':     [(between_days_sum(16, 23)/8)],
-	'days 24-31':      [(between_days_sum(24, 31)/7.416)]
-}
+    if unit == 'Quantity':
+        for day in range(1, 32):
+            d = df[df.date.dt.day == day]
+            raw_data.append(d.quantity.sum())
+    elif unit == 'Turnover':
+        for day in range(1, 32):
+            d = df[df.date.dt.day == day]
+            raw_data.append(d.turnover.sum())
+    else:
+        sys.exit("Incorrect unit")
 
-print(raw_data)
+    month_str = df.iloc[0].date.strftime("%B")
+    print(unit + ' ' + month_str + ' ' + str(year))
+    print(raw_data)
+    title = month_str + ' ' + str(year) if month_is_specific else 'All months'
+    histogram(raw_data, title, 'Date', unit)
 
-histogram(raw_data,'Time')
+    if month_is_specific:
+        file_name = 'PLC/month_sale/' + unit + '/' + unit + '_' + str(year) + '_' + str(
+            df.iloc[0].date.month) + '(' + month_str + ')'
+    else:
+        file_name = 'PLC/month_sale/' + unit + '/' + unit + '_all_available_months'
+    directory = os.path.dirname(file_name)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    plt.savefig(file_name)
+    print('Saved plot' + '\n----------------------------')
+
+def plot_per_day_individual_months(dataframe, unit, year):
+    first_available_month = 6 if (year == 2016) else 1
+    last_available_month = 12 if (year == 2016) else 9
+
+    for month in range(first_available_month, last_available_month + 1):
+        df = dataframe[(dataframe.date.dt.month == month) & (dataframe.date.dt.year == year)]
+        plot_per_day(df, unit, year, True)
+
+
+dataframe = dl.load_sales_file('C:/Users/SM-Baerbar/Documents/GitHub/P5/CleanData/CleanedData.rpt')
+plot_per_day(dataframe, 'Quantity', 2016)
+plot_per_day(dataframe, 'Turnover', 2016)
+plot_per_day_individual_months(dataframe, 'Quantity', 2016)
+plot_per_day_individual_months(dataframe, 'Quantity', 2017)
+plot_per_day_individual_months(dataframe, 'Turnover', 2016)
+plot_per_day_individual_months(dataframe, 'Turnover', 2017)
