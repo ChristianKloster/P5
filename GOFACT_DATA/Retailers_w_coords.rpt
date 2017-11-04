@@ -1,0 +1,158 @@
+chainid;Chainname;id;Name;Address;postalcode;city;country;lat;lng;region
+1;OneChain;2;OneStore - Holbæk;Ahlgade ;4300;Holbæk;Denmark;55.7146554;11.717578;Sjælland
+1;OneChain;3;OneStore - Storcenter Nord;Storcenter Nord;8200;Århus;Denmark;56.162939;10.203921;Midtjylland
+1;OneChain;4;OneStore - Amagerbrogade;Amagerbrogade ;2300;København;Denmark;55.6760968;12.5683372;Sjælland
+1;OneChain;5;OneStore - Allum;Gamla Kronvägen ;43333;Allum;Sweden;57.739289;12.1060334;Udland
+1;OneChain;7;OneStore - City 2;City ;2630;Høje Taastrup;Denmark;55.65927319999999;12.242497;Sjælland
+1;OneChain;8;OneStore - Down Town;addresse;-1;Oslo;Norway;59.9138688;10.7522454;Udland
+1;OneChain;9;OneStore - Esbjerg;Kongensgade ;6700;Esbjerg;Denmark;55.476466;8.459405;Sønderjylland
+1;OneChain;10;OneStore - Fisketorvet;Fisketorvet;1560;København;Denmark;55.6760968;12.5683372;Sjælland
+1;OneChain;11;OneStore - Frederiksberg;Frederiksberg Centret;2000;Frederiksberg;Denmark;55.677069;12.513321;Sjælland
+1;OneChain;12;OneStore - Frederikshavn;Danmarkgade A;9900;Frederikshavn;Denmark;57.442711;10.521006;Nordjylland
+1;OneChain;14;OneStore - Glostrup;Glostrup Shoppingcenter ;2600;Glostrup;Denmark;55.669217;12.402144;Sjælland
+1;OneChain;15;OneStore - Haderslev;Gravene ;6100;Haderslev;Denmark;55.250072;9.48911;Sønderjylland
+1;OneChain;16;OneStore - Koskikeskus;Hatanpään Valtatie ;33100;Tampere;Finland;61.4977524;23.7609535;Udland
+1;OneChain;17;OneStore - Ballerup;Ballerup Centret;2750;Ballerup;Denmark;55.724508;12.354765;Sjælland
+1;OneChain;22;OneStore - Oslo City;Stenersgata ;50;Oslo;Norway;59.9138688;10.7522454;Udland
+1;OneChain;23;OneStore - Jumbo;Jumbo Shopping Centre;1510;Vantaa;Finland;60.29335239999999;25.0377686;Udland
+1;OneChain;25;OneStore - Leiden;Haarlemmerstraat ;2312;GE Leiden;Holland;52.1602547;4.4922845;Udland
+1;OneChain;26;OneStore - Nijmegen ;Broerstraat ;6511;KM Nijmegen;Holland;51.815847;5.804105499999999;Udland
+1;OneChain;27;OneStore - Väla;Marknadsvägen ;26036;Ödåkra;Sweden;56.1045818;12.7483633;Udland
+2;SecondChain;28;2ndStore - Rødovre;Rødovre Centrum ;2610;Rødovre;Denmark;55.6889548;12.4492456;Sjælland
+2;SecondChain;29;2ndStore - Oslo Herre;vej;-1;by;Norway;63.9819442;10.4180619;Udland
+2;SecondChain;30;2ndStore - Oslo Pige;vej;-1;by;Norway;63.9819442;10.4180619;Udland
+2;SecondChain;31;2ndStore - Kgs. Nytorv;Kgs. Nytorv ;1095;København K;Denmark;55.6841989;12.5795433;Sjælland
+2;SecondChain;32;2ndStore - Illum Herre;Illum;1001;København K;Denmark;55.6841989;12.5795433;Sjælland
+2;SecondChain;33;2ndStore - Illum Pige;Illum;1001;København K;Denmark;55.6841989;12.5795433;Sjælland
+2;SecondChain;34;2ndStore - Ros torv;Ro’s Torv Shoppingcenter;4000;Roskilde;Denmark;55.64191;12.087845;Sjælland
+2;SecondChain;35;2ndStore - Købmager. Herre;Købmagergade ;1150;København;Denmark;55.6760968;12.5683372;Sjælland
+2;SecondChain;36;2ndStore - Købmag. Pige;Købmagergade ;1150;København;Denmark;55.6760968;12.5683372;Sjælland
+2;SecondChain;37;2ndStore - Mood;Mood;11144;Stockholm;Sweden;59.32932349999999;18.0685808;Udland
+2;SecondChain;38;2ndStore - Klostergade;Klostergade ;8000;Aarhus C;Denmark;56.1460465;10.2027261;Midtjylland
+2;SecondChain;39;2ndStore - Lyngby;Lyngby Hovedgade ;2800;Kgs. Lyngby;Denmark;55.763516;12.4949429;Sjælland
+2;SecondChain;40;2ndStore - Biblio. Gatan;vej;-1;by;Sweden;60.12816100000001;18.643501;Udland
+2;SecondChain;41;2ndStore - Novalund;vej;-1;by;Sweden;60.12816100000001;18.643501;Udland
+2;SecondChain;42;2ndStore - Wolvenstraat;vej;-1;by;Holland;51.4694216;5.565006599999999;Udland
+2;SecondChain;44;2ndStore - Studiestræde;Studiestræde ;1455;København K;Denmark;55.6841989;12.5795433;Sjælland
+2;SecondChain;45;2ndStore - Værnedamsvej;Værnedamsvej ;1619;København V;Denmark;55.6713789;12.5606475;Sjælland
+2;SecondChain;46;2ndStore - Bruuns;Bruuns Galleri;8000;Aarhus C;Denmark;56.1460465;10.2027261;Midtjylland
+2;SecondChain;47;2ndStore - Fields;Fields;2300;København S;Denmark;55.6508754;12.5991891;Sjælland
+2;SecondChain;48;2ndStore - Kolding;Kolding Storcenter;6000;Kolding;Denmark;55.495973;9.4730519;Sønderjylland
+2;SecondChain;49;2ndStore - Rosengårdcenter;Rosengårdcentret ;5220;Odense SØ;Denmark;55.3632242;10.4896986;Fyn
+2;SecondChain;50;2ndStore - Horsens;Bytorv;8700;Horsens;Denmark;55.8581302;9.8475881;Midtjylland
+2;SecondChain;51;2ndStore - Pilestræde;Pilestræde C;1112;København K;Denmark;55.6841989;12.5795433;Sjælland
+2;SecondChain;52;2ndStore - Ringsted;Ringsted Outlet;4100;Ringsted;Denmark;55.442952;11.791372;Sjælland
+2;SecondChain;53;2ndStore - Vejle;Bryggen;7100;Vejle;Denmark;55.7113112;9.536354;Midtjylland
+2;SecondChain;54;2ndStore - Aalborg Friis;Friis Shoppingcenter;9000;Aalborg;Denmark;57.0488195;9.921747;Nordjylland
+2;SecondChain;55;2ndStore - Vestergade;Vestergade  st. tv.;5000;Odense;Denmark;55.40375599999999;10.40237;Fyn
+2;SecondChain;56;2ndStore - Esbjerg;Kongensgade , st. th.;6700;Esbjerg;Denmark;55.476466;8.459405;Sønderjylland
+2;SecondChain;57;2ndStore - Aalborg Storcenter;Vej ;-1;Aalborg;Denmark;57.0488195;9.921747;Nordjylland
+2;SecondChain;58;2ndStore - Bispensgade;Bispensgade ;9000;Aalborg;Denmark;57.0488195;9.921747;Nordjylland
+2;SecondChain;59;2ndStore - BORGEN;Borgen Shopping;6400;Sønderborg;Denmark;54.913811;9.792178;Sønderjylland
+2;SecondChain;60;2ndStore - Frederiksberg;Frederiksberg Centret;2000;Frederiksberg;Denmark;55.677069;12.513321;Sjælland
+2;SecondChain;61;2ndStore - Søndergade;Søndergade ;8000;Aarhus C;Denmark;56.1460465;10.2027261;Midtjylland
+2;SecondChain;62;2ndStore - Bogstadveien;Bogstadveien ;355;Oslo;Norway;59.9138688;10.7522454;Udland
+2;SecondChain;64;2ndStore - Akerbrygge;Vej ;-1;by;Norway;63.9819442;10.4180619;Udland
+2;SecondChain;65;2ndStore - Illum Jeans;Illum;1001;København K;Denmark;55.6841989;12.5795433;Sjælland
+4;ThirdChain;66;3rdStore Pilestræde;Pilestræde A, St. Th.;1112;København K;Denmark;55.6841989;12.5795433;Sjælland
+4;ThirdChain;67;3rdStore Vejle;Bryggen;7100;Vejle;Denmark;55.7113112;9.536354;Sønderjylland
+4;ThirdChain;68;3rdStore Fields;Fields;2200;København S;Denmark;55.6508754;12.5991891;Sjælland
+4;ThirdChain;69;3rdStore Odense;Kongensgade , st.;5000;Odense C;Denmark;55.40375599999999;10.40237;Fyn
+4;ThirdChain;70;3rdStore Aalborg Friis;Friis Shoppingcenter;9000;Aalborg;Denmark;57.0488195;9.921747;Nordjylland
+4;ThirdChain;71;3rdStore Bruuns;Bruuns Galleri;8000;Aarhus C;Denmark;56.1460465;10.2027261;Midtjylland
+4;ThirdChain;72;3rdStore Frederiksberg;Frederiksberg Centret;2000;Frederiksberg;Denmark;55.677069;12.513321;Sjælland
+4;ThirdChain;73;3rdStore STORE TORV;Store Torv ;8000;Aarhus C;Denmark;56.1460465;10.2027261;Midtjylland
+4;ThirdChain;74;3rdStore Amagertorv;Amagertorv ;1160;København K;Denmark;55.6841989;12.5795433;Sjælland
+2;SecondChain;75;2ndStore - Malmø;Södra förstagatan ;21143;Malmö;Sweden;55.604981;13.003822;Udland
+2;SecondChain;76;2ndStore - Emporia;Vej ;-1;by;Sweden;60.12816100000001;18.643501;Udland
+2;SecondChain;77;2ndStore - Brunogallerian;Vej ;-1;by;Sweden;60.12816100000001;18.643501;Udland
+2;SecondChain;78;2ndStore - Korsgatan;Korsgatan ;41116;Göteborg;Sweden;57.70887;11.97456;Udland
+2;SecondChain;79;2ndStore - Amsterdam;Vej ;-1;by;Holland;51.4694216;5.565006599999999;Udland
+2;SecondChain;80;2ndStore - Rotterdam ;Meent a ;3011;JD Rotterdam;Holland;51.9206568;4.4768265;Udland
+2;SecondChain;88;2ndStore - Slottsgata;vej;-1;by;Norway;63.9819442;10.4180619;Udland
+1;OneChain;110;OneStore - Birsta;Birsta City;85753;Sundsvall;Sweden;62.390811;17.306927;Udland
+1;OneChain;111;OneStore - Borås;Österlånggatan ;50337;Borås;Sweden;57.72103500000001;12.939819;Udland
+1;OneChain;112;OneStore - Burlöv;Burlöv Center;23237;Arlöv;Sweden;55.6345009;13.0744097;Udland
+1;OneChain;113;OneStore - Erikslund;Erikslund Shopping center;72138;Västerås;Sweden;59.60990049999999;16.5448092;Udland
+1;OneChain;114;OneStore - Frölunda;Frölunda Torg ;42142;Göteborg;Sweden;57.70887;11.97456;Udland
+1;OneChain;115;OneStore - Grand Samarkand;Grand Samarkand Köpcentrum;35246;Växjö;Sweden;56.8790044;14.8058523;Udland
+1;OneChain;116;OneStore - Trollhättan;Etage Shopping;46170;Trollhättan;Sweden;58.28348939999999;12.2858206;Udland
+1;OneChain;117;OneStore - Torp;Torp Köpcentrum;45176;Uddevalla;Sweden;58.3498003;11.935649;Udland
+1;OneChain;118;OneStore - Nordby;Nordby Shoppingcenter;45270;Strömstad;Sweden;58.9383459;11.1791872;Udland
+1;OneChain;119;OneStore - Kouvola;Veturi Shopping Center;45720;Kouvola;Finland;60.8678835;26.7041602;Udland
+1;OneChain;120;OneStore - Ideapark;Ideaparkinkatu ;37570;Lempäälä;Finland;61.3141111;23.7524484;Udland
+1;OneChain;121;OneStore - Gunerius;Gunerius Kjøpesenter;184;Oslo;Norway;59.9138688;10.7522454;Udland
+1;OneChain;122;OneStore - Linderud;Linderud Senter;594;Oslo;Norway;59.9138688;10.7522454;Udland
+1;OneChain;123;OneStore - Tveita;Tveita Senter;671;Oslo;Norway;59.9138688;10.7522454;Udland
+1;OneChain;124;OneStore - Liertoppen;Liertoppen Kjøpesenter;3420;Drammen;Norway;59.7440738;10.2044565;Udland
+1;OneChain;125;OneStore - Strømmen;Strømmen Storsenter;2010;Strømmen;Norway;59.9457645;11.0072632;Udland
+1;OneChain;126;OneStore - Herkules;Herkules Senter;3730;Skien;Norway;59.1881606;9.6127694;Udland
+1;OneChain;127;OneStore - Hønefoss;Kuben Kjøpesenter;3510;Hønefoss;Norway;60.16822250000001;10.2564171;Udland
+1;OneChain;128;OneStore - Hamar;CC Stadion Indkøbssenter;2317;hamar;Norway;60.7945331;11.0679977;Udland
+1;OneChain;129;OneStore - Jekta;Jekta Storsenter;9015;Tromsø;Norway;69.6492047;18.9553239;Udland
+1;OneChain;130;OneStore - Jessheim;Jessheim Storsenter;2050;Jessheim;Norway;60.14758189999999;11.169393;Udland
+1;OneChain;131;OneStore - Madla;Amfi Madla;4042;Hafrsfjord;Norway;58.92751159999999;5.6607055;Udland
+1;OneChain;132;OneStore - Molde;Amfi Roseby;6415;Molde;Norway;62.73723520000001;7.1607306;Udland
+1;OneChain;133;OneStore - Steinkjær;Amfi Steinkjer;7714;Steinkjer;Norway;64.01501929999999;11.4952627;Udland
+1;OneChain;134;OneStore - Sørlandscenter;Sørlandssenteret;4636;Kristiansand;Norway;58.15991189999999;8.0182064;Udland
+1;OneChain;135;OneStore - Gulskogen;Gulskogen Senter;3048;Drammen;Norway;59.7440738;10.2044565;Udland
+1;OneChain;136;OneStore - Sandvika;Sandvika Storsenter;1337;Sandvika;Norway;59.8909053;10.5277867;Udland
+1;OneChain;137;OneStore - Sirkus;Sirkus Shopping;7044;Trondheim;Norway;63.4305149;10.3950528;Udland
+1;OneChain;138;OneStore - Lagunen;Lagunen Storsenter;5239;Bergen;Norway;60.39126279999999;5.3220544;Udland
+1;OneChain;139;OneStore - Råholt;Amfi Eidsvoll;2070;Råholt;Norway;60.27513309999999;11.1790131;Udland
+1;OneChain;140;OneStore - Sartor;Sartor Storsenter;5353;Straume;Norway;68.687698;14.4829185;Udland
+1;OneChain;142;OneStore - Randers Storcenter;Randers Storcenter;8900;Randers;Denmark;56.460584;10.036539;Midtjylland
+1;OneChain;143;OneStore - Viborg;Sct. Mathias Centret ;8800;Viborg;Denmark;56.45202699999999;9.3963471;Midtjylland
+1;OneChain;144;OneStore - Silkeborg;Vestergade ;8600;Silkeborg;Denmark;56.176362;9.5549217;Midtjylland
+1;OneChain;145;OneStore - Rosengårdscentret;Rosengårdscentret;5220;Odense SØ;Denmark;55.3632242;10.4896986;Fyn
+1;OneChain;146;OneStore - Køge;Brogade ;4600;Køge;Denmark;55.45752599999999;12.1821809;Sjælland
+1;OneChain;147;OneStore - Hundige Storcenter;Waves Shoppingcenter;2670;Greve;Denmark;55.5790965;12.2552774;Sjælland
+1;OneChain;148;OneStore - Horsens Bytorv;Søndergade ;8700;Horsens;Denmark;55.8581302;9.8475881;Midtjylland
+1;OneChain;149;OneStore - Aalborg Storcenter;Aalborg Storcenter;9200;Aalborg SV;Denmark;57.0102181;9.8865386;Nordjylland
+1;OneChain;150;OneStore - Hjørring;Metropol;9800;Hjørring;Denmark;57.4567788;9.995763499999999;Nordjylland
+1;OneChain;151;OneStore - Holstebro;Nørregade ;7500;Holstebro;Denmark;56.36153400000001;8.621727;Midtjylland
+1;OneChain;152;OneStore - Valby;Spinderiet;2500;Valby;Denmark;55.6616617;12.5167832;Sjælland
+1;OneChain;153;OneStore - Tarup Center;Tarup Center;5210;Odense NV;Denmark;55.4191472;10.2942712;Fyn
+1;OneChain;154;OneStore - Herning Centret;Herning Centret;7400;Herning;Denmark;56.138557;8.967322;Midtjylland
+1;OneChain;155;OneStore - Kolding Storcenter;Kolding Storcenter;6000;Kolding;Denmark;55.495973;9.4730519;Sønderjylland
+1;OneChain;156;OneStore - Lyngby;Lyngby Storcenter ;2800;Kgs. Lyngby;Denmark;55.763516;12.4949429;Sjælland
+1;OneChain;157;OneStore - Vejle;Torvegade ;7100;Vejle;Denmark;55.7113112;9.536354;Sønderjylland
+1;OneChain;158;OneStore - Randers City;Sct. Mortensgade ;8900;Randers;Denmark;56.460584;10.036539;Midtjylland
+1;OneChain;159;OneStore - Odense City;Kongensgade  st. tv.;5000;Odense C;Denmark;55.40375599999999;10.40237;Fyn
+1;OneChain;160;OneStore - Varde;Kræmmergade  st.;6800;Varde;Denmark;55.623151;8.482149999999999;Sønderjylland
+1;OneChain;161;OneStore - Sønderborg;Kastanie Álle ;6400;Sønderborg;Denmark;54.913811;9.792178;Sønderjylland
+1;OneChain;162;OneStore - Ryesgade;Ryesgade ;8000;Aarhus C;Denmark;56.1460465;10.2027261;Midtjylland
+1;OneChain;163;OneStore - Svendborg;Gerritsgade ;5700;Svendborg;Denmark;55.067434;10.607282;Fyn
+1;OneChain;164;OneStore - Østerbrogade;Østerbrogade ;2100;København;Denmark;55.6760968;12.5683372;Sjælland
+1;OneChain;166;OneStore - Amersfoort;Langestraat ;3811;AC Amersfoort;Holland;52.1514512;5.390681;Udland
+1;OneChain;167;OneStore - Delft;Paradijspoort -;2611;MB Delft;Holland;51.98371;4.3570168;Udland
+1;OneChain;168;OneStore - Den Bosch;De Arena;5211;XT 's-Hertogenbosch;Holland;51.7327604;5.318804;Udland
+1;OneChain;170;OneStore - Kvadrat;Kvadrat, Gamle Stokkavei ;4313;Sandnes;Norway;58.8532585;5.7329455;Udland
+1;OneChain;180;OneStore - M44;M Kjøpesenter, Jupiterveien ;4340;Bryne;Norway;58.73579299999999;5.6477347;Udland
+1;OneChain;181;OneStore - Moa;Amfi Moa, Langelandsveien ;6010;Ålesund;Norway;62.47222840000001;6.149482099999999;Udland
+1;OneChain;182;OneStore - Østfolhallen;Dikeveien , Frederikstad;1661;Rolvsøy;Norway;59.26652499999999;11.0140031;Udland
+1;OneChain;183;OneStore - Skanderborg;Bloms Butikker, Adelgade -;8660;Skanderborg;Denmark;56.037247;9.9297989;Midtjylland
+1;OneChain;185;OneStore - Ribe;Nederdammen  C;6760;Ribe;Denmark;55.326936;8.774665;Sønderjylland
+2;SecondChain;247;2ndStore - Lyngby Torv;Lyngby Hovedgade ;2800;Kgs. Lyngby;Denmark;55.763516;12.4949429;Sjælland
+2;SecondChain;248;2ndStore - Helsinki;x;-1;Helsinki;Finland;60.192059;24.945831;Udland
+2;SecondChain;250;2ndStore - Bikini Berlin;x;-1;Berlin;Germany;52.52000659999999;13.404954;Udland
+2;SecondChain;332;2ndStore - Trondheim;Trondheim;-1;Trondheim;Norway;63.4305149;10.3950528;Udland
+2;ThirdChain;333;3rdStore - Oslo;Oslo;-1;Oslo;Norway;59.9138688;10.7522454;Udland
+1;OneChain;349;OneStore - Farum;Farum Bytorv;3520;Farum;Denmark;55.813039;12.370791;Sjælland
+2;SecondChain;360;2ndStore - Outlet Barkarby;Outlet Barkarby;17738;Outlet Barkarby;Sweden;59.41708500000001;17.8576479;Udland
+1;OneChain;362;OneStore - Lillehammer;Strandtorget Indkøbssenter;2609;Lillehammer;Norway;61.1152713;10.4662306;Udland
+1;OneChain;363;OneStore - Stovner;Stovner Senter;985;Oslo;Norway;59.9138688;10.7522454;Udland
+1;OneChain;364;OneStore - Sello;Sello Shopping Mall;2600;Espoo;Finland;60.2054911;24.6559;Udland
+2;ThirdChain;418;3rdStore Amsterdam;Hartenstraat ;0;BZ Amsterdam;Holland;52.3749239;4.8318452;Udland
+2;SecondChain;421;2ndStore - Berlin Mitte;Mitte;0;Berlin;Germany;52.52000659999999;13.404954;Udland
+1;OneChain;436;OneStore - Aalborg City;Bredegade ;0;Aalborg;Denmark;57.0488195;9.921747;Nordjylland
+2;SecondChain;451;2ndStore - Samsoe.com;Webshop;0;Kbh;Denmark;55.6760968;12.5683372;Sjælland
+1;OneChain;455;OneStore - Haarlem;Grote Houtstraat ;0;SR Haarlem;Holland;52.3755323;4.6603691;Udland
+1;OneChain;459;OneStore - Kotka;Keskuskatu ;48100;Kotka;Finland;60.4665666;26.9459403;Udland
+1;OneChain;460;OneStore - Hillerød;Slotsgade ;0;Hillerød;Denmark;55.927909;12.300806;Sjælland
+1;OneChain;466;OneStore - Enschede;Klanderij ;0;HS Enschede;Holland;52.2215372;6.8936619;Udland
+1;OneChain;469;OneStore - Ski;Ski Storsenter;0;Ski;Norway;59.7196318;10.8358795;Udland
+1;OneChain;471;OneStore - Tønsberg ;Farmandstredet Shopping Senter;0;Tønsberg;Norway;59.3085573;10.4272034;Udland
+1;OneChain;472;OneStore - Oasen;Austbøvegen ;0;Karmsund;Norway;59.382504;5.266439900000001;Udland
+1;OneChain;474;OneStore - Larvik;Nordbyen Shopping;0;Larvik;Norway;59.0538363;10.0295463;Udland
+1;OneChain;475;OneStore - Kuopio;Matkuksentie ;0;Kuopio;Finland;62.89796999999999;27.6781725;Udland
