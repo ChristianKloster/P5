@@ -43,8 +43,8 @@ ch1_sales = all_df[all_df.retailerID.isin(ch1_retailers)].copy()
 # instans
 cfp = ColorFeatureProvider(ch1_sales)
 
-# table1 =  cfp.get_color_popularity(date = pd.date_range('2017-01-01', '2017-01-15').tolist())
-table2 =  cfp.get_color_popularity(color = ['black', 'rose dust'])
+table1 =  cfp.get_color_popularity(date = pd.date_range('2017-01-01', '2017-01-15').tolist())
+# table2 =  cfp.get_color_popularity(color = ['black', 'rose dust'])
 # table3 =  cfp.get_color_popularity(color = 'black', date = '2016-12-17')
 # table4 =  cfp.get_color_popularity(date = '2016-12-17')
 # table5 =  cfp.get_color_popularity(date = '2016-12-17')
@@ -59,8 +59,7 @@ table2 =  cfp.get_color_popularity(color = ['black', 'rose dust'])
 
 import matplotlib.pyplot as plt
 
-plt.figure()
-table2.plot()
+table1.plot()
 plt.show()
 
 # table.to_csv('ch1_colors.csv')
