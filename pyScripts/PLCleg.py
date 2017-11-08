@@ -88,7 +88,7 @@ def featureplcCD(d, id):
         timedif.iloc[x] = int(test.iloc[x].days)
     timedif.iloc[0] = 1
     timedif.iloc[-1] = 1
-    tempslope = (next['quantity'] - prev['quantity'])/(2*timedif['date'])
+    tempslope = (next['quantity'] - prev['quantity'])/timedif['date']
     slope = tempslope.reindex(df['date'])
     for x in tempslope.index:
         slope.iloc[x] = tempslope.iloc[x]
