@@ -33,7 +33,7 @@ def month_change_distance_feature(df, retailerID):
 
 
 
-def week_feature(df, retailerID):
+def week_quantity_feature(df, retailerID):
     df = df[df.retailerID == retailerID]
 
     # Df containing only required columns with date as index
@@ -42,6 +42,18 @@ def week_feature(df, retailerID):
     df.set_index('date', inplace=True)
 
     df = df.rolling('7d').sum()
+
+    return df.quantity
+
+def month_quantity_feature(df, retailerID):
+    df = df[df.retailerID == retailerID]
+
+    # Df containing only required columns with date as index
+    col_list = ["date", "quantity"]
+    df = df[col_list]
+    df.set_index('date', inplace=True)
+
+    df = df.rolling('30d').sum()
 
     return df.quantity
 
@@ -81,57 +93,61 @@ def weekday_feature(df, retailerID):
 
     return df
 
-def SoerenSort(df, strdate, retailerID):
-    #date = df.date.strptime(strdate, '%d%b%Y')
-
+def month_feature(df, retailerID):
     df = df[df.retailerID == retailerID]
 
-    #Df containing only required columns with date as index
-    col_list = ["date", "quantity"]
+    # Df containing only required columns
+    col_list = ['date']
     df = df[col_list]
-    df.set_index('date', inplace=True)
-    #df.index = df['date']
-    #df = df.drop('date', 1)
+
+    #Initialize a list for every month
+    jan_list, feb_list, mar_list, apr_list, may_list, jun_list, jul_list, aug_list, sep_list, okt_list, nov_list, dec_list = ([] for i in range(12))
 
 
-    weeks_sum_list = df.resample('W').sum()
-    print(weeks_sum_list)
-    print(df)
+    # for every weekday in every row in df, set value to 1 if for weekday if it is this day, else 0
+    for index, row in df.iterrows():
+        jan_list.append(1) if row['date'].month == 1 else jan_list.append(0)
+        feb_list.append(1) if row['date'].month == 2 else feb_list.append(0)
+        mar_list.append(1) if row['date'].month == 3 else mar_list.append(0)
+        apr_list.append(1) if row['date'].month == 4 else apr_list.append(0)
+        may_list.append(1) if row['date'].month == 5 else may_list.append(0)
+        jun_list.append(1) if row['date'].month == 6 else jun_list.append(0)
+        jul_list.append(1) if row['date'].month == 7 else jul_list.append(0)
+        aug_list.append(1) if row['date'].month == 8 else aug_list.append(0)
+        sep_list.append(1) if row['date'].month == 9 else sep_list.append(0)
+        okt_list.append(1) if row['date'].month == 10 else okt_list.append(0)
+        nov_list.append(1) if row['date'].month == 11 else nov_list.append(0)
+        dec_list.append(1) if row['date'].month == 12 else dec_list.append(0)
 
+    #Make a colum containing a true/false (1/0) value for each weekday (mon-sun)
+    df['jan'] = jan_list
+    df['feb'] = feb_list
+    df['mar'] = mar_list
+    df['apr'] = apr_list
+    df['may'] = may_list
+    df['jun'] = jun_list
+    df['jul'] = jul_list
+    df['aug'] = aug_list
+    df['sep'] = sep_list
+    df['okt'] = okt_list
+    df['nov'] = nov_list
+    df['dec'] = dec_list
 
-    df.quantity = np.nan
-    print(df)
+    #DF containing only true/false (1/0) value for each weekday (mon-sun)
+    col_list = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
+    df = df[col_list]
 
-    print(df.iloc[0][0])
-    print(weeks_sum_list.iloc[0][0])
-    print(df.index.values[0])
-    print(weeks_sum_list.index.values[0])
-    if df.index.values[0] == weeks_sum_list.index.values[0]:
-        print("Same date!")
-
-    for value in weeks_sum_list.index.values:
-        if value in df.index:
-            df.at[value, 'quantity'] = weeks_sum_list.at[value, 0]
-    print(df)
-    #df['quantity'] = df.apply(lambda row: my_test(row[df.index.values], weeks_sum_list), axis=1)
-
-    #Fill blank quantities with previous values (same week)
-    #df.fillna(method='ffill')
-
-    #for index, row in df.iterrows():
-    #    if index in weeks_sum_list[0]
-    #        indices = list(np.where(weeks_sum_list["date"] == date)[0])
-    #        value = weeks_sum_list.iloc[indices].quantity
-    #        index
-
+    return df
 
 dataframe = dl.load_sales_file('C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt')
 print('--- data loaded ---')
 print("--- %s seconds ---" % (time.time() - start_time))
 #SoerenSort(dataframe, '07Nov2017', 66)
-#week_feature(dataframe,66)
+#week_quantity_feature(dataframe,66)
 #weekday_feature(dataframe, 66)
-month_change_distance_feature(dataframe, 66)
+#month_change_distance_feature(dataframe, 66)
+#month_quantity_feature(dataframe, 66)
+month_feature(dataframe, 66)
 
 print('--- result calculated ---')
 print("--- %s seconds ---" % (time.time() - start_time))
