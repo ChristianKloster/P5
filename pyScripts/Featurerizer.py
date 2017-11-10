@@ -6,6 +6,13 @@ import time
 import numpy as np
 import calendar
 
+#Submethod for getting avg value in a list
+def get_avg(lst):
+    if len(lst)>0:
+        return sum(lst) / len(lst)
+    else:
+        return 0
+
 #Returns a list of distances to the first date of the month (0 if first)
 def month_first_dist_feature(df, retailerID):
     df = df[df.retailerID == retailerID]
@@ -166,6 +173,59 @@ def month_feature(df, retailerID):
     df = df[col_list]
 
     return df
+
+#Returns a list all discounts as percent
+def discount_to_percent(df):
+    percent_list = []
+
+    for i in range(0, len(df)):
+        if df.discount[i] == 0:
+            percent_list.append(0)
+
+        else:
+            percent_list.append(-1 * df.dicount/(-1*df.discount[i]+df.turnover[i])*100)
+            print(-1 * df.dicount/(-1 * df.discount[i]+df.turnover[i])*100)
+
+    return percent_list
+
+#Returns a list of avg style price for each transaction
+def get_avg_price_in_style(df):
+    styles = df.styleNumber.unique()
+    all_styles_avg_price = []
+    avg_price_for_trans = []
+
+    for style in styles: #Finding the average price
+        indexes = df.index[df.styleNumber == style].tolist()
+        single_style_list= []
+
+        for index in indexes:
+            value=df.turnover[index]+(df.discount[index]*-1)
+            single_style_list.append(value)
+
+        all_styles_avg_price.append(get_avg(single_style_list))
+
+    for i in range(0, len(df)-1): #searches the all_styles_avg_price list for the price at the index of the style in the styles list and inserts that on the spot in the main feature file where set style occurs .
+        avg_value =all_styles_avg_price[styles.index[df.styleNumber[i]]]
+        avg_price_for_trans.append(avg_value)
+
+    return avg_price_for_trans
+
+#Returns a list with average day price for each transaction.
+def create_avg_list(dataframe, parameter):
+    full_list = []
+    single_day_list = []
+
+    for i in range(0, len(dataframe)):
+        day = dataframe.date[i]
+
+        if i == len(dataframe.date) or dataframe.date[i+1] != day:
+            full_list.append(get_avg(single_day_list))
+            print(len(full_list))
+            single_day_list = []
+        else:
+            for i in dataframe.quantity[i]: #Adds the item one time for each quantity.
+                single_day_list.append(dataframe[parameter][i])
+    return full_list
 
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
