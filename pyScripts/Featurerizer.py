@@ -355,7 +355,7 @@ def make_feature_col(df, window = '7d'):
 
     return data
 
-def get_featur_name():
+def get_feature_name():
     return col_name
 
 #----------------------------------------------------------------------------------------------------------#
