@@ -6,17 +6,9 @@ import time
 import numpy as np
 import calendar
 
-#Submethod for getting avg value in a list
-def get_avg(lst):
-    if len(lst)>0:
-        return sum(lst) / len(lst)
-    else:
-        return 0
 
-#Returns a list of distances to the first date of the month (0 if first)
-def month_first_dist_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+#Returns a dataframe column of distances to the first date of the month (0 if first)
+def month_first_dist_feature(df):
     # Df containing only required columns with date as index
     col_list = ['date']
     df = df[col_list]
@@ -26,12 +18,12 @@ def month_first_dist_feature(df, retailerID):
     for index, row in df.iterrows():
         mfdist_list.append(row['date'].day - 1)
 
-    return mfdist_list
+    df['mfdist_list'] = mfdist_list
 
-#Returns a list of distances to the last date of the month (0 if last)
-def month_last_dist_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
+    return df.mfdist_list
 
+#Returns a list of distances to the first date of the next month (0 if last)
+def month_next_first_dist_feature(df):
     # Df containing only required columns with date as index
     col_list = ['date']
     df = df[col_list]
@@ -40,14 +32,14 @@ def month_last_dist_feature(df, retailerID):
 
     for index, row in df.iterrows():
         days_in_month = calendar.monthrange(row['date'].year, row['date'].month)[1]
-        mldist_list.append((days_in_month - row['date'].day))
+        mldist_list.append((days_in_month + 1 - row['date'].day))
 
-    return mldist_list
+    df['mldist_list'] = mldist_list
 
-#Returns a list of distances to the first date of the month (0 if first)
-def month_change_dist_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
+    return df.mldist_list
 
+#Returns a list of distances to the nearest month change
+def month_change_dist_feature(df):
     # Df containing only required columns with date as index
     col_list = ['date']
     df = df[col_list]
@@ -57,15 +49,15 @@ def month_change_dist_feature(df, retailerID):
     for index, row in df.iterrows():
         days_in_month = calendar.monthrange(row['date'].year, row['date'].month)[1]
         day = row['date'].day
-        val = day if (days_in_month - day) > day else days_in_month - day
+        val = day - 1 if (days_in_month - day) > day else days_in_month + 1 - day
         mcdist_list.append(val)
 
-    return mcdist_list
+    df['mcdist_list'] = mcdist_list
+
+    return df.mcdist_list
 
 #Returns a df column of summed quantities for the past 7 days
-def week_quantity_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+def week_quantity_feature(df):
     # Df containing only required columns with date as index
     col_list = ["date", "quantity"]
     df = df[col_list]
@@ -76,9 +68,7 @@ def week_quantity_feature(df, retailerID):
     return df.quantity
 
 #Returns a df column of summed quantities for the past 30 days
-def month_quantity_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+def month_quantity_feature(df):
     # Df containing only required columns with date as index
     col_list = ["date", "quantity"]
     df = df[col_list]
@@ -90,9 +80,7 @@ def month_quantity_feature(df, retailerID):
 
 #Returns a df containing 7 columns, one for each weekday
 #If the date of the row is a someday, the value in the column representing someday will be 1, else 0
-def weekday_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+def weekday_feature(df):
     # Df containing only required columns with date as index
     col_list = ['date']
     df = df[col_list]
@@ -128,9 +116,7 @@ def weekday_feature(df, retailerID):
 
 #Returns a df containing 12 columns, one for each month
 #If the date of the row is in a somemonth, the value in the column representing somemonth will be 1, else 0
-def month_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+def month_feature(df):
     # Df containing only required columns
     col_list = ['date']
     df = df[col_list]
@@ -175,58 +161,28 @@ def month_feature(df, retailerID):
     return df
 
 #Returns a list all discounts as percent
-def discount_to_percent(df):
-    percent_list = []
+def discount_to_percent(dataframe):
+    df = dataframe[['discount','turnover']]
 
-    for i in range(0, len(df)):
-        if df.discount[i] == 0:
-            percent_list.append(0)
+    df['discountP'] = abs(df['discount'])/(abs(df['discount'])+abs(df['turnover']))*100
 
-        else:
-            percent_list.append(-1 * df.dicount/(-1*df.discount[i]+df.turnover[i])*100)
-            print(-1 * df.dicount/(-1 * df.discount[i]+df.turnover[i])*100)
-
-    return percent_list
+    return df['discountP']
 
 #Returns a list of avg style price for each transaction
-def get_avg_price_in_style(df):
-    styles = df.styleNumber.unique()
-    all_styles_avg_price = []
-    avg_price_for_trans = []
+def get_avg_price_in_style(dataframe):
+    df = dataframe[['styleNumber','turnover','discount','quantity']]
+    df = df.groupby('styleNumber').sum(numeric_only = True)
+    df['avg_style_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
 
-    for style in styles: #Finding the average price
-        indexes = df.index[df.styleNumber == style].tolist()
-        single_style_list= []
-
-        for index in indexes:
-            value=df.turnover[index]+(df.discount[index]*-1)
-            single_style_list.append(value)
-
-        all_styles_avg_price.append(get_avg(single_style_list))
-
-    for i in range(0, len(df)-1): #searches the all_styles_avg_price list for the price at the index of the style in the styles list and inserts that on the spot in the main feature file where set style occurs .
-        avg_value =all_styles_avg_price[styles.index[df.styleNumber[i]]]
-        avg_price_for_trans.append(avg_value)
-
-    return avg_price_for_trans
+    return df['avg_style_price']
 
 #Returns a list with average day price for each transaction.
-def create_avg_list(dataframe, parameter):
-    full_list = []
-    single_day_list = []
+def create_avg_list(dataframe):
+    df = dataframe[['date','turnover','discount','quantity']]
+    df = df.groupby('date').sum(numeric_only = True)
+    df['avg_day_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
 
-    for i in range(0, len(dataframe)):
-        day = dataframe.date[i]
-
-        if i == len(dataframe.date) or dataframe.date[i+1] != day:
-            full_list.append(get_avg(single_day_list))
-            print(len(full_list))
-            single_day_list = []
-        else:
-            for i in dataframe.quantity[i]: #Adds the item one time for each quantity.
-                single_day_list.append(dataframe[parameter][i])
-    return full_list
-
+    return df['avg_day_price']
 
 def featureplcBD(df, id):
     #Relativt store udslag i hældningen, ikke nær så præcis som CD metoden, kan produceres for dags dato
@@ -355,7 +311,7 @@ def make_feature_col(df, window = '7d'):
 
     return data
 
-def get_featur_name():
+def get_feature_name():
     return col_name
 
 #----------------------------------------------------------------------------------------------------------#
@@ -363,5 +319,10 @@ def get_featur_name():
 
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
-#dataframe = dl.load_sales_file('sm_dir')
+kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt'
 
+dataframe = dl.load_sales_file(kloster_dir)
+
+print(get_avg_price_in_style(dataframe))
+
+print(create_avg_list(dataframe))
