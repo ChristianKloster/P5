@@ -6,13 +6,6 @@ import time
 import numpy as np
 import calendar
 
-#Submethod for getting avg value in a list
-def get_avg(lst):
-    if len(lst)>0:
-        return sum(lst) / len(lst)
-    else:
-        return 0
-
 #Returns a list of distances to the first date of the month (0 if first)
 def month_first_dist_feature(df, retailerID):
     df = df[df.retailerID == retailerID]
@@ -175,58 +168,28 @@ def month_feature(df, retailerID):
     return df
 
 #Returns a list all discounts as percent
-def discount_to_percent(df):
-    percent_list = []
+def discount_to_percent(dataframe):
+    df = dataframe[['discount','turnover']]
 
-    for i in range(0, len(df)):
-        if df.discount[i] == 0:
-            percent_list.append(0)
+    df['discountP'] = abs(df['discount'])/(abs(df['discount'])+abs(df['turnover']))*100
 
-        else:
-            percent_list.append(-1 * df.dicount/(-1*df.discount[i]+df.turnover[i])*100)
-            print(-1 * df.dicount/(-1 * df.discount[i]+df.turnover[i])*100)
-
-    return percent_list
+    return df['discountP']
 
 #Returns a list of avg style price for each transaction
-def get_avg_price_in_style(df):
-    styles = df.styleNumber.unique()
-    all_styles_avg_price = []
-    avg_price_for_trans = []
+def get_avg_price_in_style(dataframe):
+    df = dataframe[['styleNumber','turnover','discount','quantity']]
+    df = df.groupby('styleNumber').sum(numeric_only = True)
+    df['avg_style_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
 
-    for style in styles: #Finding the average price
-        indexes = df.index[df.styleNumber == style].tolist()
-        single_style_list= []
-
-        for index in indexes:
-            value=df.turnover[index]+(df.discount[index]*-1)
-            single_style_list.append(value)
-
-        all_styles_avg_price.append(get_avg(single_style_list))
-
-    for i in range(0, len(df)-1): #searches the all_styles_avg_price list for the price at the index of the style in the styles list and inserts that on the spot in the main feature file where set style occurs .
-        avg_value =all_styles_avg_price[styles.index[df.styleNumber[i]]]
-        avg_price_for_trans.append(avg_value)
-
-    return avg_price_for_trans
+    return df['avg_style_price']
 
 #Returns a list with average day price for each transaction.
-def create_avg_list(dataframe, parameter):
-    full_list = []
-    single_day_list = []
+def create_avg_list(dataframe):
+    df = dataframe[['date','turnover','discount','quantity']]
+    df = df.groupby('date').sum(numeric_only = True)
+    df['avg_day_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
 
-    for i in range(0, len(dataframe)):
-        day = dataframe.date[i]
-
-        if i == len(dataframe.date) or dataframe.date[i+1] != day:
-            full_list.append(get_avg(single_day_list))
-            print(len(full_list))
-            single_day_list = []
-        else:
-            for i in dataframe.quantity[i]: #Adds the item one time for each quantity.
-                single_day_list.append(dataframe[parameter][i])
-    return full_list
-
+    return df['avg_day_price']
 
 def featureplcBD(df, id):
     #Relativt store udslag i hældningen, ikke nær så præcis som CD metoden, kan produceres for dags dato
@@ -363,5 +326,10 @@ def get_featur_name():
 
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
-#dataframe = dl.load_sales_file('sm_dir')
+kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt'
 
+dataframe = dl.load_sales_file(kloster_dir)
+
+print(get_avg_price_in_style(dataframe))
+
+print(create_avg_list(dataframe))
