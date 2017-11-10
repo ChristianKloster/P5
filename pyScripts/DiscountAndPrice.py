@@ -18,8 +18,8 @@ def discount_to_percent(dataframe):
             percent_list.append(0)
 
         else:
-            percent_list.append(dataframe.dicount/(dataframe.discount[i]+dataframe.turnover[i])*100)
-            print(dataframe.dicount/(dataframe.discount[i]+dataframe.turnover[i])*100)
+            percent_list.append(-1 * dataframe.dicount/(-1*dataframe.discount[i]+dataframe.turnover[i])*100)
+            print(-1 * dataframe.dicount/(-1 * dataframe.discount[i]+dataframe.turnover[i])*100)
 
     return percent_list
 
