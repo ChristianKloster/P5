@@ -1,0 +1,20 @@
+
+
+
+
+mens_tiemgroup = ['MEN - ACCESSORIES',
+				'MEN - BASIC - DON'T USE',
+				'MEN - BELTS/SCARF/TIE',
+				'MEN - BLAZER',
+				'MEN - CARDIGAN',
+				'MEN - JACKETS',
+				'MEN - JEANS',
+				'MEN - KNIT',
+				'MEN - PANTS',
+				'MEN - POLO',
+				'MEN - SHIRTS',
+				'MEN - SHOES', 
+				'MEN - SHORTS',
+				'MEN - SWEAT',               
+				'MEN - T-SHIRTS',            
+				'MEN - UNDERWEAR/SOCKS']    
