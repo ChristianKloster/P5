@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2017-11-06" view-index="0" gantt-divider-location="178" resource-divider-location="300" version="2.8.5" locale="da">
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2017-11-13" view-index="0" gantt-divider-location="460" resource-divider-location="300" version="2.8.5" locale="da">
     <description/>
     <view zooming-state="default:5" id="gantt-chart">
-        <field id="tpd3" name="Navn" width="83" order="0"/>
-        <field id="tpd4" name="Start dato" width="46" order="1"/>
-        <field id="tpd5" name="Slut dato" width="45" order="2"/>
+        <field id="tpd3" name="Navn" width="177" order="0"/>
+        <field id="tpd4" name="Start dato" width="140" order="1"/>
+        <field id="tpd5" name="Slut dato" width="139" order="2"/>
         <option id="color.recent"><![CDATA[#ff6600]]></option>
     </view>
     <view id="resource-table">
@@ -43,7 +43,7 @@
         <task id="22" name="Conclusion" color="#ff6600" meeting="false" start="2017-12-20" duration="1" complete="0" expand="true"/>
         <task id="38" name="Data processering" color="#8cb6ce" meeting="false" start="2017-09-13" duration="35" complete="0" expand="true"/>
         <task id="53" name="Konstruer algoritmer" color="#8cb6ce" meeting="false" start="2017-10-24" duration="34" complete="0" expand="true"/>
-        <task id="71" name="Tests" color="#8cb6ce" meeting="false" start="2017-10-24" duration="28" complete="0" expand="true"/>
+        <task id="71" name="Tests" color="#8cb6ce" meeting="false" start="2017-10-24" duration="34" complete="0" expand="true"/>
         <task id="20" name="Test skrivning" color="#ff6600" meeting="false" start="2017-11-29" duration="5" complete="0" expand="true"/>
         <task id="54" name="Problem afgrænsning" color="#8cb6ce" meeting="true" start="2017-10-12" duration="0" complete="0" expand="true"/>
         <task id="55" name="algoritme færdig" color="#8cb6ce" meeting="true" start="2017-12-08" duration="0" complete="0" expand="true"/>
