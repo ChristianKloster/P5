@@ -4,7 +4,8 @@ import dataloader as dl
 from retailerdata import retailerData as rd
 
 #Open the same the clean file to make changes
-df = dl.load_sales_file(r'C:\Git repo\P5\CleanData\CleanedData.rpt')
+df = dl.load_sales_file(r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt')
+rdf = rd(r'C:\Users\Christian\Desktop\Min Git mappe\P5\retailers_w_coords.rpt')
 
 #For fresh start
 #df = dl.load_sales_files(dl.get_all_files(r'C:\Git repo\P5\GOFACT_DATA\Sales_20'))
@@ -27,6 +28,18 @@ def data_cleaner(df, parameter, words, path): #Can handle 0, one or more words. 
         print('Didn\'t do nothing')
 
     df.to_csv(path_or_buf=path+'CleanedData.rpt', index = False, sep=';',encoding='utf-8')
+
+
+def add_chainId(df,rdf):
+    chainId_list = []
+
+    for i in range(0,len(df)):
+        chainId_list.append(rdf.get_chainnumber(df.retailerID[i]))
+
+    df['chainID'] = chainId_list
+    return df
+
+add_chainId(df, rdf).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt', index = False, sep=';',encoding='utf-8')
 
 #ALREADY CALLED:
 #rddf = rd(r'C:\Git repo\P5\Retailers_w_coords.rpt')
