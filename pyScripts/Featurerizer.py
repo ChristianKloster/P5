@@ -320,6 +320,44 @@ def featureacceleration(df, id):
     acceleration = acceleration.fillna(value=0)
     return acceleration
 
+
+
+col_name = 'color_popularity'
+
+class ColorFeatureProvider:
+    def __init__(self, df, window = '7d'):
+        df = df.copy()
+        df.colorname = df.colorname.str.lower().str.strip()
+        df_table = pd.pivot_table(df, values='quantity', index=['date'], columns=['colorname'], aggfunc=np.sum).fillna(0)
+        df_table = df_table.rolling(window).mean()
+        self.table = df_table
+
+    def get_color_popularity(self, color=None, date=None):
+        if color == None and date == None:
+            return self.table
+        elif color == None:
+            return self.table.loc[date,:]
+        elif date == None:
+            return self.table.loc[:,color]
+        else:
+            return self.table.loc[date, color]
+
+def make_feature_col(df, window = '7d'):
+    cfp = ColorFeatureProvider(df, window)
+    print('table made')
+    data = df.copy()
+    data.colorname = data.colorname.str.lower().str.strip()
+    data = data.dropna(axis=0, how='any')
+
+    data[col_name] = np.nan
+
+    data[col_name] = tuple(map(lambda color, date: cfp.get_color_popularity(color = color, date = date), data['colorname'], data['date']))
+
+    return data
+
+def get_featur_name():
+    return col_name
+
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
 

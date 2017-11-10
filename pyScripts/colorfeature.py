@@ -3,6 +3,8 @@ import pandas as pd
 import retailerdata as rd
 import numpy as np
 
+col_name = 'color_popularity'
+
 class ColorFeatureProvider:
 	def __init__(self, df, window = '7d'):
 		df = df.copy()
@@ -28,36 +30,36 @@ def make_feature_col(df, window = '7d'):
 	data.colorname = data.colorname.str.lower().str.strip()
 	data = data.dropna(axis=0, how='any')
 
-	col_name = 'color_popularity'
 	data[col_name] = np.nan
 
 	data[col_name] = tuple(map(lambda color, date: cfp.get_color_popularity(color = color, date = date), data['colorname'], data['date']))
 
 	return data
 
-
+def get_featur_name():
+	return col_name
 
 # test af kode
 
-# sales
-files = dl.get_all_files('C:\P5GIT\P5\GOFACT_DATA/Sales_20')
-all_df = dl.load_sales_files(files)
+# # sales
+# files = dl.get_all_files('C:\P5GIT\P5\GOFACT_DATA/Sales_20')
+# all_df = dl.load_sales_files(files)
 
-# retailers
-RD = rd.retailerData('C:\P5GIT\P5\GOFACT_DATA/Retailers_w_coords.rpt')
-retailer_data = RD.get_dataframe()
+# # retailers
+# RD = rd.retailerData('C:\P5GIT\P5\GOFACT_DATA/Retailers_w_coords.rpt')
+# retailer_data = RD.get_dataframe()
 
-# kæde 1
-ch1 = retailer_data[retailer_data.chainid == 1]
-ch1_retailers = ch1['id']
-ch1_sales = all_df[all_df.retailerID.isin(ch1_retailers)].copy()
+# # kæde 1
+# ch1 = retailer_data[retailer_data.chainid == 1]
+# ch1_retailers = ch1['id']
+# ch1_sales = all_df[all_df.retailerID.isin(ch1_retailers)].copy()
 
 
-# instans:
+# # instans:
 
-new_df = make_feature_col(ch1_sales)
+# new_df = make_feature_col(ch1_sales)
 
-print(new_df)
+# print(new_df)
 
 # cfp = ColorFeatureProvider(ch1_sales)
 
