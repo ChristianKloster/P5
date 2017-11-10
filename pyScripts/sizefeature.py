@@ -153,6 +153,13 @@ class SizeFeature:
 		else: 
 			return 8888 
 
+# requires that chinid and ismale is present
+def make_sizefeature_col(df):
+	sf = SizeFeature()
+
+	data = df.copy()
+	data['size_scale'] = tuple(map(lambda size, chainid, ismale: sf.get_size_feature(size=size, chainid = chainid, male = ismale), data['size'], data['chainid'], date['ismale']))
+	return data
 
 # zizzi
 # Vores styles er altid udviklet efter europæiske måle standarder.
