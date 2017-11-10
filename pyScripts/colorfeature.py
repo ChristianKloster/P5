@@ -6,7 +6,6 @@ import numpy as np
 class ColorFeatureProvider:
 	def __init__(self, df, window = '7d'):
 		df = df.copy()
-		df.loc[:,'colorname'] = df.loc[:,'colorname'].str.lower().str.strip()
 		df.colorname = df.colorname.str.lower().str.strip()
 		df_table = pd.pivot_table(df, values='quantity', index=['date'], columns=['colorname'], aggfunc=np.sum).fillna(0)
 		df_table = df_table.rolling(window).mean()
