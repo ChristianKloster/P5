@@ -6,10 +6,9 @@ import time
 import numpy as np
 import calendar
 
-#Returns a list of distances to the first date of the month (0 if first)
-def month_first_dist_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
 
+#Returns a dataframe column of distances to the first date of the month (0 if first)
+def month_first_dist_feature(df):
     # Df containing only required columns with date as index
     col_list = ['date']
     df = df[col_list]
@@ -19,12 +18,12 @@ def month_first_dist_feature(df, retailerID):
     for index, row in df.iterrows():
         mfdist_list.append(row['date'].day - 1)
 
-    return mfdist_list
+    df['mfdist_list'] = mfdist_list
 
-#Returns a list of distances to the last date of the month (0 if last)
-def month_last_dist_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
+    return df.mfdist_list
 
+#Returns a list of distances to the first date of the next month (0 if last)
+def month_next_first_dist_feature(df):
     # Df containing only required columns with date as index
     col_list = ['date']
     df = df[col_list]
@@ -33,14 +32,14 @@ def month_last_dist_feature(df, retailerID):
 
     for index, row in df.iterrows():
         days_in_month = calendar.monthrange(row['date'].year, row['date'].month)[1]
-        mldist_list.append((days_in_month - row['date'].day))
+        mldist_list.append((days_in_month + 1 - row['date'].day))
 
-    return mldist_list
+    df['mldist_list'] = mldist_list
 
-#Returns a list of distances to the first date of the month (0 if first)
-def month_change_dist_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
+    return df.mldist_list
 
+#Returns a list of distances to the nearest month change
+def month_change_dist_feature(df):
     # Df containing only required columns with date as index
     col_list = ['date']
     df = df[col_list]
@@ -50,15 +49,15 @@ def month_change_dist_feature(df, retailerID):
     for index, row in df.iterrows():
         days_in_month = calendar.monthrange(row['date'].year, row['date'].month)[1]
         day = row['date'].day
-        val = day if (days_in_month - day) > day else days_in_month - day
+        val = day - 1 if (days_in_month - day) > day else days_in_month + 1 - day
         mcdist_list.append(val)
 
-    return mcdist_list
+    df['mcdist_list'] = mcdist_list
+
+    return df.mcdist_list
 
 #Returns a df column of summed quantities for the past 7 days
-def week_quantity_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+def week_quantity_feature(df):
     # Df containing only required columns with date as index
     col_list = ["date", "quantity"]
     df = df[col_list]
@@ -69,9 +68,7 @@ def week_quantity_feature(df, retailerID):
     return df.quantity
 
 #Returns a df column of summed quantities for the past 30 days
-def month_quantity_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+def month_quantity_feature(df):
     # Df containing only required columns with date as index
     col_list = ["date", "quantity"]
     df = df[col_list]
@@ -83,9 +80,7 @@ def month_quantity_feature(df, retailerID):
 
 #Returns a df containing 7 columns, one for each weekday
 #If the date of the row is a someday, the value in the column representing someday will be 1, else 0
-def weekday_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+def weekday_feature(df):
     # Df containing only required columns with date as index
     col_list = ['date']
     df = df[col_list]
@@ -121,9 +116,7 @@ def weekday_feature(df, retailerID):
 
 #Returns a df containing 12 columns, one for each month
 #If the date of the row is in a somemonth, the value in the column representing somemonth will be 1, else 0
-def month_feature(df, retailerID):
-    df = df[df.retailerID == retailerID]
-
+def month_feature(df):
     # Df containing only required columns
     col_list = ['date']
     df = df[col_list]
