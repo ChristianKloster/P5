@@ -163,18 +163,19 @@ def month_feature(df):
 #Returns a list all discounts as percent
 def discount_to_percent(dataframe):
     df = dataframe[['discount','turnover']]
+    discount = pd.DataFrame(columns=['discountP'], index=df.index)
+    discount['discountP'] = abs(df['discount'])/(abs(df['discount'])+abs(df['turnover']))*100
 
-    df['discountP'] = abs(df['discount'])/(abs(df['discount'])+abs(df['turnover']))*100
-
-    return df['discountP']
+    return discount
 
 #Returns a list of avg style price for each transaction
 def get_avg_price_in_style(dataframe):
     df = dataframe[['styleNumber','turnover','discount','quantity']]
-    df = df.groupby('styleNumber').sum(numeric_only = True)
-    df['avg_style_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
+    avgprice = pd.DataFrame(columns=['avg_style_price'], index=df.index)
 
-    return df['avg_style_price']
+    avgprice['avg_style_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
+
+    return avgprice
 
 #Returns a list with average day price for each transaction.
 def create_avg_list(dataframe):
@@ -184,28 +185,33 @@ def create_avg_list(dataframe):
 
     return df['avg_day_price']
 
-def featureplcBD(df, id):
+def featureplcBD(df):
     #Relativt store udslag i hældningen, ikke nær så præcis som CD metoden, kan produceres for dags dato
-    if id in df.productID:
-        df = df[df.productID == id]
-        df = df[df.styleNumber == df['styleNumber'].iloc[0]]
-    else:
-        df = df[df.styleNumber == id]
     df = df[df.quantity >= 0]
-    df = df.groupby('date', as_index=False).sum()
-    prev = df.shift(periods = 1)
-    test = df['date'] - prev['date']
-    timedif = pd.DataFrame(columns=['date'], index=test.index)
-    test = test.fillna(value=1)
-    for x in test.index:
-        timedif.iloc[x] = int(test.iloc[x].days)
-    timedif.iloc[0] = 1
-    tempslope = (df['quantity'] - prev['quantity'])/timedif['date']
-    slope = tempslope.reindex(df['date'])
-    for x in tempslope.index:
-        slope.iloc[x] = tempslope.iloc[x]
+    df = df[['date', 'chainID', 'quantity', 'styleNumber']]
+    chains = df['chainID'].unique()
+    slope = pd.DataFrame(columns=['slopeBD'], index=df.index)
+    slope[['date','styleNumber','chainID']] = df[['date','styleNumber','chainID']]
+
+    for chain in chains:
+        chaindf = df[df.chainID == chain]
+        styles = chaindf['styleNumber'].unique()
+        chaindata = slope[slope.chainID == chain]
+        for style in styles:
+            styledf = chaindf[chaindf.styleNumber == style]
+            styledf = styledf.groupby('date', as_index=False).sum(numeric_only = True)
+            styledf['chainID'] = chain
+            prev = styledf[['date', 'quantity']].shift(periods = 1)
+            timedifference = (styledf['date'] - prev['date']).dt.days
+            timedifference = timedifference.fillna(value=1)
+            timedifference.iloc[0] = 1
+            styleslope = (styledf['quantity'] - prev['quantity'])/timedifference
+            styledata = chaindata[chaindata.styleNumber == style]
+            for x in styleslope.index:
+                midlertidigdato = styledata[styledata.date == styledf['date'].iloc[x]]
+                midlertidigdato['slopeBD'] = styleslope.iloc[x]
+                slope.update(midlertidigdato)
     slope = slope.fillna(value=0)
-    slope = pd.DataFrame(slope, columns=['slopeBD'])
     return slope
 
 def featureplcCD(df, id):
@@ -234,29 +240,23 @@ def featureplcCD(df, id):
     slope = pd.DataFrame(slope, columns=['slopeCD'])
     return slope
 
-def featurealder(df, id):
-    if id in df.productID:
-        df = df[df.productID == id]
-    else:
-        df = df[df.styleNumber == id]
+def featurealder(df):
     df = df[df.quantity >= 0]
-    firstdate = df['date'].iloc[0]
-    lifetimetemp = pd.DataFrame(columns=['lifetime'], index=df.index)
-    for x in lifetimetemp.index:
-        lifetimetemp.loc[x] = int((df['date'].loc[x] - firstdate).days)
-    lifetime = lifetimetemp.reindex(df['date'])
-    for x in range(0, lifetimetemp.shape[0]):
-        lifetime.iloc[x] = lifetimetemp.iloc[x]
-    today = pd.DataFrame([int((pd.to_datetime('today') - firstdate).days)], index=[pd.to_datetime('today')], columns=['lifetime'])
-    lifetime = pd.concat([lifetime, today])
-    return(lifetime)
+    df = df[['styleNumber', 'date']]
+    styles = df['styleNumber'].unique()
+    lifetimes = pd.DataFrame(columns=['lifetime'], index=df.index)
 
-def featureacceleration(df, id):
-    if id in df.productID:
-        df = df[df.productID == id]
-    else:
-        df = df[df.styleNumber == id]
+    for style in styles:
+        tempdata = df[df.styleNumber == style]
+        firstdate = tempdata['date'].iloc[0]
+        lifetime = pd.DataFrame(columns=['lifetime'], index=tempdata.index)
+        for x in tempdata.index:
+            lifetimes.loc[x] = int((df['date'].loc[x] - firstdate).days)
+    return lifetimes
+
+def featureacceleration(df):
     df = df[df.quantity >= 0]
+    df = df[['date', 'quantity', 'productID', 'styleNumber']]
     df = df.groupby('date', as_index=False).sum()
     prev = df.shift(periods=1)
     test = df['date'] - prev['date']
@@ -481,39 +481,23 @@ def make_sizefeature_col(df):
     sf = SizeFeature()
 
     data = df.copy()
-    data['size_scale'] = tuple(map(lambda size, chainid, ismale: sf.get_size_feature(size=size, chainid = chainid, male = ismale), data['size'], data['chainid'], date['ismale']))
+    data['size_scale'] = tuple(map(lambda size, chainid, ismale: sf.get_size_feature(size=size, chainid = chainid, male = ismale), data['size'], data['chainid'], data['ismale']))
     return data
 
+def featurize(df, id, shop):
+    functionlist = {'month_feat': month_feature, 'month_change':month_change_dist_feature, 'month_first':month_first_dist_feature,
+                    'month_next_first': month_next_first_dist_feature, 'month_quantity':month_quantity_feature, 'weekday':weekday_feature,
+                    'week_quantity':week_quantity_feature, 'discount_percent':discount_to_percent, 'avg_price':create_avg_list,
+                    'avg_style':get_avg_price_in_style, 'alder':featurealder, 'acceleration':featureacceleration, 'farve':make_feature_col,
+                    'størrelse':make_sizefeature_col}
 
-mens_itemgroup = ['MEN - ACCESSORIES',
-                'MEN - BASIC - DON\'T USE',
-                'MEN - BELTS/SCARF/TIE',
-                'MEN - BLAZER',
-                'MEN - CARDIGAN',
-                'MEN - JACKETS',
-                'MEN - JEANS',
-                'MEN - KNIT',
-                'MEN - PANTS',
-                'MEN - POLO',
-                'MEN - SHIRTS',
-                'MEN - SHOES', 
-                'MEN - SHORTS',
-                'MEN - SWEAT',               
-                'MEN - T-SHIRTS',            
-                'MEN - UNDERWEAR/SOCKS']    
 
-def is_male(itemgroupname):
-    return 1 if itemgroupname in mens_itemgroup else 0
+    featuredf = featurealder(df)
+    for func in functionlist:
+        temp = func(df)
+        featuredf[temp.columns] = temp
 
-def make_ismale_col(df):
-    data = df.copy()
-    data['ismale'] = tuple(map(lambda itemgroup: is_male(itemgroup), data['SupplierItemgroupName']))
-    return data
-
-def make_isfemale_col(df):
-    data = df.copy()
-    data['isfemale'] = tuple(map(lambda itemgroup: 1 - is_male(itemgroup), data['SupplierItemgroupName']))
-    return data
+    return featuredf
 
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
@@ -521,9 +505,15 @@ def make_isfemale_col(df):
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
 kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt'
+patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\CleanedData.rpt'
 
-dataframe = dl.load_sales_file(kloster_dir)
+dataframe = dl.load_sales_file(patrick_dir)
 
-print(get_avg_price_in_style(dataframe))
+dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
+dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
+dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
-print(create_avg_list(dataframe))
+juhuehe = featurealder(dataframetest)
+print('Hej')
+# print(featurize(dataframe, 10721, 3))
+
