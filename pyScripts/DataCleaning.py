@@ -4,7 +4,7 @@ import dataloader as dl
 from retailerdata import retailerData as rd
 
 #Open the same the clean file to make changes
-df = dl.load_sales_file(r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt')
+df = dl.load_sales_file(r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData.rpt')
 rdf = rd(r'C:\Users\Christian\Desktop\Min Git mappe\P5\retailers_w_coords.rpt')
 
 #For fresh start
@@ -39,7 +39,29 @@ def add_chainId(df,rdf):
     df['chainID'] = chainId_list
     return df
 
-add_chainId(df, rdf).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt', index = False, sep=';',encoding='utf-8')
+#add_chainId(df, rdf).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt', index = False, sep=';',encoding='utf-8')
+
+def add_ismale(df):
+    ismale_list = []
+
+    for i in df.index: #range (0, len(df)):
+        if 'MEN'in (df.SupplierItemgroupName[i]):
+            if 'WOMEN'in (df.SupplierItemgroupName[i]):
+                ismale_list.append(0)
+            else:
+                ismale_list.append(1)
+        else:
+            ismale_list.append(0)
+
+    df['ismale'] = ismale_list
+    return df
+
+#add_ismale(df).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData.rpt', index = False, sep=';',encoding='utf-8')
+
+
+
+
+
 
 #ALREADY CALLED:
 #rddf = rd(r'C:\Git repo\P5\Retailers_w_coords.rpt')

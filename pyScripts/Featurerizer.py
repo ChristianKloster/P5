@@ -295,8 +295,6 @@ def featureacceleration(df):
     acceleration = acceleration.fillna(value=0)
     return acceleration
 
-
-
 col_name = 'color_popularity'
 
 class ColorFeatureProvider:
@@ -495,15 +493,15 @@ class SizeFeature:
         else: 
             return 8888 
 
-# requires that chainid and ismale is present
+# requires that chainID and ismale is present
 def make_sizefeature_col(df):
     sf = SizeFeature()
 
     data = df.copy()
-    data['size_scale'] = tuple(map(lambda size, chainid, ismale: sf.get_size_feature(size=size, chainid = chainid, male = ismale), data['size'], data['chainid'], data['ismale']))
+    data['size_scale'] = tuple(map(lambda size, chainid, ismale: sf.get_size_feature(size=size, chainid = chainid, male = ismale), data['size'], data['chainID'], data['ismale']))
     return data
 
-def featurize(df, id, shop):
+def featurize(df, path):
     functionlist = {'month_feat': month_feature, 'month_change':month_change_dist_feature, 'month_first':month_first_dist_feature,
                     'month_next_first': month_next_first_dist_feature, 'month_quantity':month_quantity_feature, 'weekday':weekday_feature,
                     'week_quantity':week_quantity_feature, 'discount_percent':discount_to_percent, 'avg_price':create_avg_list,
@@ -516,23 +514,26 @@ def featurize(df, id, shop):
         temp = func(df)
         featuredf[temp.columns] = temp
 
-    return featuredf
+    return featuredf.to_csv(path_or_buf=path + 'Features.rpt', index = False, sep=';',encoding='utf-8')
 
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
 
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
-kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt'
+kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData.rpt'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\CleanedData.rpt'
 
-dataframe = dl.load_sales_file(patrick_dir)
+dataframe = dl.load_sales_file(kloster_dir)
+dataframe = dataframe[dataframe['retailerID']==44]
 
-dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
-dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
-dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
+#dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
+#dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
+#dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
-juhuehe = featureplcCD(dataframetest)
-print(juhuehe['lifetimeChain']-juhuehe['lifetimeRetailer'])
+#juhuehe = featurealder(dataframetest)
+#print('Hej')
 # print(featurize(dataframe, 10721, 3))
+
+featurize(dataframe, path=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\'')
 
