@@ -20,7 +20,6 @@ def month_first_dist_feature(df):
 
     df['mfdist_list'] = mfdist_list
 
-    return df.mfdist_list
 
 #Returns a list of distances to the first date of the next month (0 if last)
 def month_next_first_dist_feature(df):
@@ -36,7 +35,6 @@ def month_next_first_dist_feature(df):
 
     df['mldist_list'] = mldist_list
 
-    return df.mldist_list
 
 #Returns a list of distances to the nearest month change
 def month_change_dist_feature(df):
@@ -53,30 +51,19 @@ def month_change_dist_feature(df):
         mcdist_list.append(val)
 
     df['mcdist_list'] = mcdist_list
-
-    return df.mcdist_list
+    test = df['mcdist_list']
 
 #Returns a df column of summed quantities for the past 7 days
 def week_quantity_feature(df):
     # Df containing only required columns with date as index
-    col_list = ["date", "quantity"]
-    df = df[col_list]
-    df.set_index('date', inplace=True)
 
-    df = df.rolling('7d').sum()
 
-    return df.quantity
 
 #Returns a df column of summed quantities for the past 30 days
 def month_quantity_feature(df):
     # Df containing only required columns with date as index
-    col_list = ["date", "quantity"]
-    df = df[col_list]
-    df.set_index('date', inplace=True)
 
-    df = df.rolling('30d').sum()
 
-    return df.quantity
 
 #Returns a df containing 7 columns, one for each weekday
 #If the date of the row is a someday, the value in the column representing someday will be 1, else 0
@@ -154,7 +141,6 @@ def month_feature(df):
     df['nov'] = nov_list
     df['dec'] = dec_list
 
-    #DF containing only true/false (1/0) value for each weekday (mon-sun)
     col_list = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
     df = df[col_list]
 
@@ -166,7 +152,6 @@ def discount_to_percent(dataframe):
     discount = pd.DataFrame(columns=['discountP'], index=df.index)
     discount['discountP'] = abs(df['discount'])/(abs(df['discount'])+abs(df['turnover']))*100
 
-    return discount
 
 #Returns a list of avg style price for each transaction
 def get_avg_price_in_style(dataframe):
@@ -175,7 +160,6 @@ def get_avg_price_in_style(dataframe):
 
     avgprice['avg_style_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
 
-    return avgprice
 
 #Returns a list with average day price for each transaction.
 def create_avg_list(dataframe):
@@ -208,11 +192,7 @@ def featureplcBD(df):
             styleslope = (styledf['quantity'] - prev['quantity'])/timedifference
             styledata = chaindata[chaindata.styleNumber == style]
             for x in styleslope.index:
-                datedata = styledata[styledata.date == styledf['date'].loc[x]]
-                datedata['slopeBD'] = styleslope.loc[x]
                 slope.update(datedata)
-    slope = slope.fillna(value=0)
-    return slope
 
 def featureplcCD(df):
     #Denne giver mindre udslag i hældningerne og burde give et mere korrekt udtryk, men den kan ikke produceres for dags dato
@@ -238,11 +218,7 @@ def featureplcCD(df):
             styleslope = (next['quantity'] - prev['quantity'])/timedifference
             styledata = chaindata[chaindata.styleNumber == style]
             for x in styleslope.index:
-                midlertidigdato = styledata[styledata.date == styledf['date'].loc[x]]
-                midlertidigdato['slopeCD'] = styleslope.loc[x]
                 slope.update(midlertidigdato)
-    slope = slope.fillna(value=0)
-    return slope
 
 def featurealder(df):
     df = df[df.quantity >= 0]
@@ -270,30 +246,10 @@ def featurealder(df):
             for x in styledata.index:
                 lifetimes['lifetimeRetailer'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
 
-    return lifetimes
-
 
 def featureacceleration(df):
     df = df[df.quantity >= 0]
-    df = df[['date', 'quantity', 'productID', 'styleNumber']]
-    df = df.groupby('date', as_index=False).sum()
-    prev = df.shift(periods=1)
-    test = df['date'] - prev['date']
-    timedif = pd.DataFrame(columns=['date'], index=test.index)
-    test = test.fillna(value=1)
-    for x in test.index:
-        timedif.iloc[x] = int(test.iloc[x].days)
-    timedif.iloc[0] = 1
-    slope = (df['quantity'] - prev['quantity']) / timedif['date']
-    slope = slope.fillna(value=0)
-    slope = pd.DataFrame(slope, columns=['slope'])
-    prev = slope.shift(periods=1)
-    tempaccel = (slope['slope'] - prev['slope'])/timedif['date']
-    acceleration = tempaccel.reindex(slope.index)
-    for x in tempaccel.index:
-        acceleration.iloc[x] = tempaccel.iloc[x]
     acceleration = acceleration.fillna(value=0)
-    return acceleration
 
 
 
@@ -327,7 +283,6 @@ def make_feature_col(df, window = '7d'):
 
     data[col_name] = tuple(map(lambda color, date: cfp.get_color_popularity(color = color, date = date), data['colorname'], data['date']))
 
-    return data
 
 def get_feature_name():
     return col_name
@@ -480,42 +435,25 @@ class SizeFeature:
 
 # samsoe women : http://www.sizeguide.net/womens-clothing-sizes-international-conversion-chart.html
 # http://www.samsoe.com/da/support/size-guide/mens-jeans.html
- 
 
-    def get_size_feature(self, size, chainid, male = False):
-        if chainid == 1:
             return self.mapping_ch1[size]
-        elif chainid == 2:
             if male:
                 return self.mapping_ch2_m[size]
             else:
                 return self.mapping_ch2_w[size]
-        elif chainid == 3:
             return self.mapping_ch3[size]
         else: 
-            return 8888 
 
 # requires that chainid and ismale is present
 def make_sizefeature_col(df):
     sf = SizeFeature()
 
     data = df.copy()
-    data['size_scale'] = tuple(map(lambda size, chainid, ismale: sf.get_size_feature(size=size, chainid = chainid, male = ismale), data['size'], data['chainid'], data['ismale']))
     return data
 
-def featurize(df, id, shop):
-    functionlist = {'month_feat': month_feature, 'month_change':month_change_dist_feature, 'month_first':month_first_dist_feature,
-                    'month_next_first': month_next_first_dist_feature, 'month_quantity':month_quantity_feature, 'weekday':weekday_feature,
-                    'week_quantity':week_quantity_feature, 'discount_percent':discount_to_percent, 'avg_price':create_avg_list,
-                    'avg_style':get_avg_price_in_style, 'alder':featurealder, 'acceleration':featureacceleration, 'farve':make_feature_col,
-                    'størrelse':make_sizefeature_col}
 
 
-    featuredf = featurealder(df)
     for func in functionlist:
-        temp = func(df)
-        featuredf[temp.columns] = temp
-
     return featuredf
 
 #----------------------------------------------------------------------------------------------------------#
@@ -529,10 +467,6 @@ patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\CleanedData.
 dataframe = dl.load_sales_file(patrick_dir)
 
 dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
-dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
-dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
-juhuehe = featureplcCD(dataframetest)
-print(juhuehe['lifetimeChain']-juhuehe['lifetimeRetailer'])
 # print(featurize(dataframe, 10721, 3))
 
