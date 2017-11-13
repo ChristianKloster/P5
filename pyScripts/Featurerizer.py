@@ -468,5 +468,9 @@ dataframe = dl.load_sales_file(patrick_dir)
 
 dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
 
+juhue = featurize(dataframetest)
+# heyho = week_quantity_feature(dataframetest)
+# print(heyho)
+print(juhue)
 # print(featurize(dataframe, 10721, 3))
 
