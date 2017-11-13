@@ -251,8 +251,6 @@ def featureacceleration(df):
     df = df[df.quantity >= 0]
     acceleration = acceleration.fillna(value=0)
 
-
-
 col_name = 'color_popularity'
 
 class ColorFeatureProvider:
@@ -450,17 +448,29 @@ def make_sizefeature_col(df):
 
     data = df.copy()
 <<<<<<< HEAD
-
-=======
     return data
 
+=======
+    data['size_scale'] = tuple(map(lambda size, chainid, ismale: sf.get_size_feature(size=size, chainid = chainid, male = ismale), data['size'], data['chainID'], data['ismale']))
+    return data
+
+def featurize(df, path):
+    functionlist = {'month_feat': month_feature, 'month_change':month_change_dist_feature, 'month_first':month_first_dist_feature,
+                    'month_next_first': month_next_first_dist_feature, 'month_quantity':month_quantity_feature, 'weekday':weekday_feature,
+                    'week_quantity':week_quantity_feature, 'discount_percent':discount_to_percent, 'avg_price':create_avg_list,
+                    'avg_style':get_avg_price_in_style, 'alder':featurealder, 'acceleration':featureacceleration, 'farve':make_feature_col,
+                    'størrelse':make_sizefeature_col}
+>>>>>>> 3b781570cddbace13c2971359734ae8462220510
 
 
     for func in functionlist:
 <<<<<<< HEAD
     return featuredf
 =======
+        temp = func(df)
+        featuredf[temp.columns] = temp
 
+    return featuredf.to_csv(path_or_buf=path + 'Features.rpt', index = False, sep=';',encoding='utf-8')
 >>>>>>> 3b781570cddbace13c2971359734ae8462220510
 
 #----------------------------------------------------------------------------------------------------------#
@@ -468,10 +478,13 @@ def make_sizefeature_col(df):
 
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
+kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData.rpt'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\CleanedData.rpt'
 
-dataframe = dl.load_sales_file(patrick_dir)
+dataframe = dl.load_sales_file(kloster_dir)
+dataframe = dataframe[dataframe['retailerID']==44]
 
+<<<<<<< HEAD
 dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
 
 juhue = featurize(dataframetest)
@@ -488,4 +501,5 @@ print(juhue)
 >>>>>>> 3b781570cddbace13c2971359734ae8462220510
 # print(featurize(dataframe, 10721, 3))
 
+featurize(dataframe, path=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\'')
 
