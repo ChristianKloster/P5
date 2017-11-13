@@ -208,9 +208,9 @@ def featureplcBD(df):
             styleslope = (styledf['quantity'] - prev['quantity'])/timedifference
             styledata = chaindata[chaindata.styleNumber == style]
             for x in styleslope.index:
-                midlertidigdato = styledata[styledata.date == styledf['date'].iloc[x]]
-                midlertidigdato['slopeBD'] = styleslope.iloc[x]
-                slope.update(midlertidigdato)
+                datedata = styledata[styledata.date == styledf['date'].loc[x]]
+                datedata['slopeBD'] = styleslope.loc[x]
+                slope.update(datedata)
     slope = slope.fillna(value=0)
     return slope
 
@@ -219,7 +219,7 @@ def featureplcCD(df):
     df = df[df.quantity >= 0]
     df = df[['date', 'chainID', 'quantity', 'styleNumber']]
     chains = df['chainID'].unique()
-    slope = pd.DataFrame(columns=['slopeBD'], index=df.index)
+    slope = pd.DataFrame(columns=['slopeCD'], index=df.index)
     slope[['date','styleNumber','chainID']] = df[['date','styleNumber','chainID']]
 
     for chain in chains:
@@ -232,31 +232,46 @@ def featureplcCD(df):
             styledf['chainID'] = chain
             prev = styledf[['date', 'quantity']].shift(periods = 1)
             next = styledf[['date', 'quantity']].shift(periods = -1)
-            timedifference = next['date'].dt.days - prev['date'].dt.days
+            timedifference = (next['date'] - prev['date']).dt.days
             timedifference = timedifference.fillna(value=1)
             timedifference.iloc[0] = 1
-            styleslope = (styledf['quantity'] - prev['quantity'])/timedifference
+            styleslope = (next['quantity'] - prev['quantity'])/timedifference
             styledata = chaindata[chaindata.styleNumber == style]
             for x in styleslope.index:
-                midlertidigdato = styledata[styledata.date == styledf['date'].iloc[x]]
-                midlertidigdato['slopeBD'] = styleslope.iloc[x]
+                midlertidigdato = styledata[styledata.date == styledf['date'].loc[x]]
+                midlertidigdato['slopeCD'] = styleslope.loc[x]
                 slope.update(midlertidigdato)
     slope = slope.fillna(value=0)
     return slope
 
 def featurealder(df):
     df = df[df.quantity >= 0]
-    df = df[['styleNumber', 'date']]
-    styles = df['styleNumber'].unique()
-    lifetimes = pd.DataFrame(columns=['lifetime'], index=df.index)
+    lifetimes = pd.DataFrame(columns=[['lifetimeChain', 'lifetimeRetailer']], index=df.index)
+    lifetimes[['styleNumber', 'date', 'chainID', 'retailerID']] = df[['styleNumber', 'date', 'chainID', 'retailerID']]
+    chains = df['chainID'].unique()
 
-    for style in styles:
-        tempdata = df[df.styleNumber == style]
-        firstdate = tempdata['date'].iloc[0]
-        lifetime = pd.DataFrame(columns=['lifetime'], index=tempdata.index)
-        for x in tempdata.index:
-            lifetimes.loc[x] = int((df['date'].loc[x] - firstdate).days)
+    for chain in chains:
+        chaindf = df[df.chainID == chain]
+        styles = chaindf['styleNumber'].unique()
+        chaindata = lifetimes[lifetimes.chainID == chain]
+        for style in styles:
+            styledata = chaindata[chaindata.styleNumber == style]
+            firstdate = styledata['date'].iloc[0]
+            for x in styledata.index:
+                lifetimes['lifetimeChain'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
+
+    retailers = df['retailerID'].unique()
+    for retailer in retailers:
+        retailerdf = df[df.retailerID == retailer]
+        styles = retailerdf['styleNumber'].unique()
+        for style in styles:
+            styledata = retailerdf[retailerdf.styleNumber == style]
+            firstdate = styledata['date'].iloc[0]
+            for x in styledata.index:
+                lifetimes['lifetimeRetailer'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
+
     return lifetimes
+
 
 def featureacceleration(df):
     df = df[df.quantity >= 0]
@@ -517,7 +532,7 @@ dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
 dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
 dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
-juhuehe = featurealder(dataframetest)
-print('Hej')
+juhuehe = featureplcCD(dataframetest)
+print(juhuehe['lifetimeChain']-juhuehe['lifetimeRetailer'])
 # print(featurize(dataframe, 10721, 3))
 
