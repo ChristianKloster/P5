@@ -214,30 +214,34 @@ def featureplcBD(df):
     slope = slope.fillna(value=0)
     return slope
 
-def featureplcCD(df, id):
+def featureplcCD(df):
     #Denne giver mindre udslag i hældningerne og burde give et mere korrekt udtryk, men den kan ikke produceres for dags dato
-    if id in df.productID:
-        df = df[df.productID == id]
-        df = df[df.styleNumber == df['styleNumber'].iloc[0]]
-    else:
-        df = df[df.styleNumber == id]
     df = df[df.quantity >= 0]
-    df = df.groupby('date', as_index=False).sum()
-    prev = df.shift(periods = 1)
-    next = df.shift(periods=-1)
-    test = next['date'] - prev['date']
-    timedif = pd.DataFrame(columns=['date'], index=test.index)
-    test = test.fillna(value=1)
-    for x in test.index:
-        timedif.iloc[x] = int(test.iloc[x].days)
-    timedif.iloc[0] = 1
-    timedif.iloc[-1] = 1
-    tempslope = (next['quantity'] - prev['quantity'])/timedif['date']
-    slope = tempslope.reindex(df['date'])
-    for x in tempslope.index:
-        slope.iloc[x] = tempslope.iloc[x]
+    df = df[['date', 'chainID', 'quantity', 'styleNumber']]
+    chains = df['chainID'].unique()
+    slope = pd.DataFrame(columns=['slopeBD'], index=df.index)
+    slope[['date','styleNumber','chainID']] = df[['date','styleNumber','chainID']]
+
+    for chain in chains:
+        chaindf = df[df.chainID == chain]
+        styles = chaindf['styleNumber'].unique()
+        chaindata = slope[slope.chainID == chain]
+        for style in styles:
+            styledf = chaindf[chaindf.styleNumber == style]
+            styledf = styledf.groupby('date', as_index=False).sum(numeric_only = True)
+            styledf['chainID'] = chain
+            prev = styledf[['date', 'quantity']].shift(periods = 1)
+            next = styledf[['date', 'quantity']].shift(periods = -1)
+            timedifference = next['date'].dt.days - prev['date'].dt.days
+            timedifference = timedifference.fillna(value=1)
+            timedifference.iloc[0] = 1
+            styleslope = (styledf['quantity'] - prev['quantity'])/timedifference
+            styledata = chaindata[chaindata.styleNumber == style]
+            for x in styleslope.index:
+                midlertidigdato = styledata[styledata.date == styledf['date'].iloc[x]]
+                midlertidigdato['slopeBD'] = styleslope.iloc[x]
+                slope.update(midlertidigdato)
     slope = slope.fillna(value=0)
-    slope = pd.DataFrame(slope, columns=['slopeCD'])
     return slope
 
 def featurealder(df):
