@@ -30,7 +30,8 @@ def load_sales_file(filePath):
 									'quantity',
 									'turnover',
 									'discount',
-									'chainID'],
+									'chainID',
+									'ismale'],
 								dtype={
 									'supplierID':np.int64,
 									'retialerID':np.int64,
@@ -45,7 +46,8 @@ def load_sales_file(filePath):
 									'quantity':np.int64,
 									'turnover':np.float64,
 									'discount':np.float64,
-									'chainID':np.int64})
+									'chainID':np.int64,
+									'ismale':np.int64})
 
 # Returns the dataframe containing all sales information from periods ym1_1 to ym1_2 and ym2_1 to ym2_2
 # (ym stands for year/month)

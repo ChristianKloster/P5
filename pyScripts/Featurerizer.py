@@ -444,24 +444,30 @@ class SizeFeature:
             return self.mapping_ch3[size]
         else: 
 
-# requires that chainid and ismale is present
+# requires that chainID and ismale is present
 def make_sizefeature_col(df):
     sf = SizeFeature()
 
     data = df.copy()
+<<<<<<< HEAD
+
+=======
     return data
 
 
 
     for func in functionlist:
+<<<<<<< HEAD
     return featuredf
+=======
+
+>>>>>>> 3b781570cddbace13c2971359734ae8462220510
 
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
 
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
-kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\CleanedData.rpt'
 
 dataframe = dl.load_sales_file(patrick_dir)
@@ -472,5 +478,14 @@ juhue = featurize(dataframetest)
 # heyho = week_quantity_feature(dataframetest)
 # print(heyho)
 print(juhue)
+=======
+#dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
+#dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
+#dataframetest =dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
+
+#juhuehe = featurealder(dataframetest)
+#print('Hej')
+>>>>>>> 3b781570cddbace13c2971359734ae8462220510
 # print(featurize(dataframe, 10721, 3))
+
 
