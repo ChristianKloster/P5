@@ -64,6 +64,8 @@ def load_feature_file(filePath):
 	                                'fri',
 	                                'sat',
 	                                'sun',
+									'quantityChain',
+									'turnoverChain',
 									'jan',
 									'feb',
 									'mar',
@@ -90,7 +92,12 @@ def load_feature_file(filePath):
 									'accelerationChainStyle',
 									'accelerationRetailerStyle',
 									'PLCBD',
-									'PLCCD'],
+									'PLCCD',
+									'quantityPeriod1',
+									'quantityPeriod2',
+									'p1-p2',
+									'quantityPeriod3',
+									'p2-p3'],
 								dtype={
 									'mon':np.int64,
 									'tue':np.int64,
@@ -99,6 +106,8 @@ def load_feature_file(filePath):
 									'fri':np.int64,
 									'sat':np.int64,
 									'sun':np.int64,
+									'quantityChain': np.int64,
+									'turnoverChain': np.float64,
 									'jan':np.int64,
 									'feb':np.int64,
 									'mar':np.int64,
@@ -125,7 +134,12 @@ def load_feature_file(filePath):
 									'accelerationChainStyle':np.float64,
 									'accelerationRetailerStyle':np.float64,
 									'PLCBD':np.float64,
-									'PLCCD':np.float64,})
+									'PLCCD':np.float64,
+									'quantityPeriod1':np.int64,
+				                    'quantityPeriod2':np.int64,
+									'p1-p2':np.float64,
+									'quantityPeriod3':np.int64,
+									'p2-p3':np.float64})
 
 
 
