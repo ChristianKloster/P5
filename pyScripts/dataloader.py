@@ -49,6 +49,86 @@ def load_sales_file(filePath):
 									'chainID':np.int64,
 									'ismale':np.int64})
 
+
+def load_feature_file(filePath):
+	return pd.read_csv(filePath, encoding='utf-8',
+								sep=';',
+								parse_dates=[0], # parse first column
+								skiprows=1, # skip header
+								comment='(', # ignore the '(n rows affected)' footer
+								names=[
+	                                'mon',
+	                                'tue',
+	                                'wed',
+	                                'thu',
+	                                'fri',
+	                                'sat',
+	                                'sun',
+									'jan',
+									'feb',
+									'mar',
+									'apr',
+									'may',
+									'jun',
+									'jul',
+									'aug',
+									'sep',
+									'okt',
+									'nov',
+									'dec',
+									'month_change_dist',
+									'month_first_dist',
+									'month_next_first_dist',
+									'quantity7d',
+									'quantity30d',
+									'discount_percent',
+									'avg_price',
+									'avg_price_style',
+									'color',
+									'lifetimeChain',
+									'lifetimeRetailer',
+									'accelerationChainStyle',
+									'accelerationRetailerStyle',
+									'PLCBD',
+									'PLCCD'],
+								dtype={
+									'mon':np.int64,
+									'tue':np.int64,
+									'wed':np.int64,
+									'thu':np.int64,
+									'fri':np.int64,
+									'sat':np.int64,
+									'sun':np.int64,
+									'jan':np.int64,
+									'feb':np.int64,
+									'mar':np.int64,
+									'apr':np.int64,
+									'may':np.int64,
+									'jun':np.int64,
+									'jul':np.int64,
+									'aug':np.int64,
+									'sep':np.int64,
+									'okt':np.int64,
+									'nov':np.int64,
+									'dec':np.int64,
+									'month_change_dist':np.int64,
+									'month_first_dist':np.int64,
+									'month_next_first_dist':np.int64,
+									'quantity7d':np.int64,
+									'quantity30d':np.int64,
+									'discount_percent':np.float64,
+									'avg_price':np.float64,
+									'avg_price_style':np.float64,
+									'color':np.float64,
+									'lifetimeChain':np.int64,
+									'lifetimeRetailer':np.int64,
+									'accelerationChainStyle':np.float64,
+									'accelerationRetailerStyle':np.float64,
+									'PLCBD':np.float64,
+									'PLCCD':np.float64,})
+
+
+
 # Returns the dataframe containing all sales information from periods ym1_1 to ym1_2 and ym2_1 to ym2_2
 # (ym stands for year/month)
 def load_sales_files_ranges(filepath, ym1_1, ym1_2, ym2_1, ym2_2):
