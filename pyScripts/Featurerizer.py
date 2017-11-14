@@ -274,7 +274,7 @@ def featurealder(df):
             styledata = chaindata[chaindata.styleNumber == style]
             firstdate = styledata['date'].iloc[0]
             for x in styledata.index:
-                lifetimes['lifetimeChain'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
+                lifetimes['lifetimeChain'].iloc[x] = int((styledata['date'].iloc[x] - firstdate).days)
 
     retailers = df['retailerID'].unique()
     for retailer in retailers:
@@ -284,7 +284,7 @@ def featurealder(df):
             styledata = retailerdf[retailerdf.styleNumber == style]
             firstdate = styledata['date'].iloc[0]
             for x in styledata.index:
-                lifetimes['lifetimeRetailer'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
+                lifetimes['lifetimeRetailer'].iloc[x] = int((styledata['date'].iloc[x] - firstdate).days)
 
     return lifetimes[['lifetimeChain', 'lifetimeRetailer']]
 
@@ -570,7 +570,7 @@ def featurize(df, path):
         if isinstance(temp, pd.Series):
             featuredf[func] = temp
 
-    return featuredf.to_csv(path_or_buf=path + 'Features.rpt', index=False, sep=';', encoding='utf-8')
+        return featuredf.to_csv(path_or_buf=path + 'Features.rpt', index=False, sep=';', encoding='utf-8')
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
 
@@ -579,16 +579,16 @@ def featurize(df, path):
 kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData.rpt'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\CleanedData.rpt'
 
-dataframe = dl.load_sales_file(kloster_dir)
+dataframe = dl.load_sales_file(patrick_dir)
 
 dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
-#dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
-#dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
+dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
+dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
 
-featurize(dataframetest, path=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\'')
+featurize(dataframe, path=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\'')
 # heyho = week_quantity_feature(dataframetest)
 # print(heyho)
-#print(juhue)
+print(juhue)
 # print(featurize(dataframe, 10721, 3))
 
