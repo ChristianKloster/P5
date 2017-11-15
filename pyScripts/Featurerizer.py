@@ -6,6 +6,94 @@ import time
 import numpy as np
 import calendar
 
+def today_turnover(df):
+    todayturnover = pd.DataFrame(columns=['turnoverChain'], index=df.index)
+    todayturnover[['date', 'chainID', 'turnover']] = df[['date', 'chainID', 'turnover']]
+    chains = todayturnover['chainID'].unique()
+
+    for chain in chains:
+        chaindf = todayturnover[todayturnover.chainID == chain]
+        chaindf = chaindf.groupby('date', as_index=False).sum(numeric_only = True)
+        chaindata = todayturnover[todayturnover.chainID == chain]
+        for x in chaindf.index:
+            datedata = chaindata[chaindata.date == chaindf['date'].iloc[x]]
+            datedata['turnoverChain'] = chaindf['turnover'].iloc[x]
+            todayturnover.update(datedata)
+    return todayturnover['turnoverChain']
+
+def today_quantity(df):
+    todayquantity = pd.DataFrame(columns=['quantityChain'], index=df.index)
+    todayquantity[['date', 'chainID', 'quantity', 'productID']] = df[['date', 'chainID', 'quantity', 'productID']]
+    chains = todayquantity['chainID'].unique()
+
+    for chain in chains:
+        chaindf = todayquantity[todayquantity.chainID == chain]
+        products = chaindf['productID'].unique()
+        chaindata = todayquantity[todayquantity.chainID == chain]
+        for product in products:
+            productdf = chaindf[chaindf.productID == product]
+            productdf = productdf.groupby('date', as_index=False).sum(numeric_only = True)
+            productdata = chaindata[chaindata.productID == product]
+            for x in productdf.index:
+                datedata = productdata[productdata.date == productdf['date'].iloc[x]]
+                datedata['quantityChain'] = productdf['quantity'].iloc[x]
+                todayquantity.update(datedata)
+    return todayquantity['quantityChain']
+
+def quantity_period(df, number_periods = 3, length_period = 4):
+    col_list = ["date", "quantity", "retailerID", "productID"]
+    period_col = []
+    for i in range (0, number_periods):
+        period_col.append('quantityPeriod{0}'.format(i+1))
+    quantityPerioddf = pd.DataFrame(columns=period_col, index=df.index)
+    quantityPerioddf[col_list] = df[col_list]
+    retailers = quantityPerioddf["retailerID"].unique()
+
+    for retailer in retailers:
+        retailerdf = quantityPerioddf[quantityPerioddf.retailerID == retailer]
+        products = retailerdf["productID"].unique()
+
+        for product in products:
+            productdf = retailerdf[retailerdf.productID == product]
+            for i in range(1, number_periods+1):
+                productsumdf = productdf.rolling('{0}d'.format(length_period*i), on='date').sum()
+                if i>1:
+                    productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity']-productdf['quantityPeriod{0}'.format(i-1)]
+                else:
+                    productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity']
+                quantityPerioddf.update(productdf)
+
+    return quantityPerioddf[period_col]
+
+def stigning_period(df, number_periods = 3, length_period = 4):
+    col_list = ["date", "quantity", "retailerID", "productID"]
+    period_col = []
+    for i in range (1, number_periods+1):
+        period_col.append('quantityPeriod{0}'.format(i))
+        if i > 1:
+            period_col.append('P{0}-P{1}'.format(i - 1, i))
+    quantityPerioddf = pd.DataFrame(columns=period_col, index=df.index)
+    quantityPerioddf[col_list] = df[col_list]
+    retailers = quantityPerioddf["retailerID"].unique()
+
+    for retailer in retailers:
+        retailerdf = quantityPerioddf[quantityPerioddf.retailerID == retailer]
+        products = retailerdf["productID"].unique()
+
+        for product in products:
+            productdf = retailerdf[retailerdf.productID == product]
+            for i in range(1, number_periods+1):
+                productsumdf = productdf.rolling('{0}d'.format(length_period*i), on='date').sum()
+                productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity']
+                if i>1:
+                    productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity'] - productdf['quantityPeriod{0}'.format(i - 1)]
+                    productdf['P{0}-P{1}'.format(i-1, i)] = \
+                        (productdf['quantityPeriod{0}'.format(i-1)] - productdf['quantityPeriod{0}'.format(i)])/length_period
+                else:
+                    productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity']
+                quantityPerioddf.update(productdf)
+
+    return quantityPerioddf[period_col]
 
 #Returns a dataframe column of distances to the first date of the month (0 if first)
 def month_first_dist_feature(df):
@@ -20,7 +108,7 @@ def month_first_dist_feature(df):
 
     df['mfdist_list'] = mfdist_list
 
-    return df.mfdist_list
+    return df['mfdist_list']
 
 #Returns a list of distances to the first date of the next month (0 if last)
 def month_next_first_dist_feature(df):
@@ -36,7 +124,7 @@ def month_next_first_dist_feature(df):
 
     df['mldist_list'] = mldist_list
 
-    return df.mldist_list
+    return df['mldist_list']
 
 #Returns a list of distances to the nearest month change
 def month_change_dist_feature(df):
@@ -53,30 +141,46 @@ def month_change_dist_feature(df):
         mcdist_list.append(val)
 
     df['mcdist_list'] = mcdist_list
-
-    return df.mcdist_list
+    test = df['mcdist_list']
+    return df['mcdist_list']
 
 #Returns a df column of summed quantities for the past 7 days
 def week_quantity_feature(df):
     # Df containing only required columns with date as index
-    col_list = ["date", "quantity"]
-    df = df[col_list]
-    df.set_index('date', inplace=True)
+    col_list = ["date", "quantity", "retailerID", "productID"]
+    last7df = pd.DataFrame(columns=['quantityLast7'], index=df.index)
+    last7df[col_list] = df[col_list]
+    retailers = last7df["retailerID"].unique()
 
-    df = df.rolling('7d').sum()
+    for retailer in retailers:
+        retailerdf = last7df[last7df.retailerID == retailer]
+        products = retailerdf["productID"].unique()
+        for product in products:
+            productdf = retailerdf[retailerdf.productID == product]
+            productdf = productdf.rolling('7d', on='date').sum()
+            productdf['quantityLast7'] = productdf['quantity']
+            last7df.update(productdf)
 
-    return df.quantity
+    return last7df['quantityLast7']
 
 #Returns a df column of summed quantities for the past 30 days
 def month_quantity_feature(df):
     # Df containing only required columns with date as index
-    col_list = ["date", "quantity"]
-    df = df[col_list]
-    df.set_index('date', inplace=True)
+    col_list = ["date", "quantity", "retailerID", "productID"]
+    last30df = pd.DataFrame(columns=['quantityLast30'], index=df.index)
+    last30df[col_list] = df[col_list]
+    retailers = last30df["retailerID"].unique()
 
-    df = df.rolling('30d').sum()
+    for retailer in retailers:
+        retailerdf = last30df[last30df.retailerID == retailer]
+        products = retailerdf["productID"].unique()
+        for product in products:
+            productdf = retailerdf[retailerdf.productID == product]
+            productdf = productdf.rolling('30d', on='date').sum()
+            productdf['quantityLast30'] = productdf['quantity']
+            last30df.update(productdf)
 
-    return df.quantity
+    return last30df['quantityLast30']
 
 #Returns a df containing 7 columns, one for each weekday
 #If the date of the row is a someday, the value in the column representing someday will be 1, else 0
@@ -154,7 +258,7 @@ def month_feature(df):
     df['nov'] = nov_list
     df['dec'] = dec_list
 
-    #DF containing only true/false (1/0) value for each weekday (mon-sun)
+    #DF containing only true/false (1/0) value for each month (jan-dec)
     col_list = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
     df = df[col_list]
 
@@ -163,118 +267,180 @@ def month_feature(df):
 #Returns a list all discounts as percent
 def discount_to_percent(dataframe):
     df = dataframe[['discount','turnover']]
+    discount = pd.DataFrame(columns=['discountP'], index=df.index)
+    discount['discountP'] = abs(df['discount'])/(abs(df['discount'])+abs(df['turnover']))*100
 
-    df['discountP'] = abs(df['discount'])/(abs(df['discount'])+abs(df['turnover']))*100
-
-    return df['discountP']
+    return discount['discountP']
 
 #Returns a list of avg style price for each transaction
 def get_avg_price_in_style(dataframe):
     df = dataframe[['styleNumber','turnover','discount','quantity']]
-    df = df.groupby('styleNumber').sum(numeric_only = True)
-    df['avg_style_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
+    avgprice = pd.DataFrame(columns=['avg_style_price'], index=df.index)
 
-    return df['avg_style_price']
+    avgprice['avg_style_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
+
+    return avgprice['avg_style_price']
 
 #Returns a list with average day price for each transaction.
+#Executive grazt
 def create_avg_list(dataframe):
     df = dataframe[['date','turnover','discount','quantity']]
-    df = df.groupby('date').sum(numeric_only = True)
+    df = df.groupby('date', as_index= False).sum(numeric_only = True)
     df['avg_day_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
+    avg_lst= []
+    x=0
 
-    return df['avg_day_price']
+    for i in dataframe.index:
+        if dataframe.date[i] == df.date[x]:
+            avg_lst.append(df.avg_day_price[x])
+        elif x<df.shape[0]-1:
+            x+=1
 
-def featureplcBD(df, id):
+    print(len(avg_lst))
+    return avg_lst
+
+def featureplcBD(df):
     #Relativt store udslag i hældningen, ikke nær så præcis som CD metoden, kan produceres for dags dato
-    if id in df.productID:
-        df = df[df.productID == id]
-        df = df[df.styleNumber == df['styleNumber'].iloc[0]]
-    else:
-        df = df[df.styleNumber == id]
     df = df[df.quantity >= 0]
-    df = df.groupby('date', as_index=False).sum()
-    prev = df.shift(periods = 1)
-    test = df['date'] - prev['date']
-    timedif = pd.DataFrame(columns=['date'], index=test.index)
-    test = test.fillna(value=1)
-    for x in test.index:
-        timedif.iloc[x] = int(test.iloc[x].days)
-    timedif.iloc[0] = 1
-    tempslope = (df['quantity'] - prev['quantity'])/timedif['date']
-    slope = tempslope.reindex(df['date'])
-    for x in tempslope.index:
-        slope.iloc[x] = tempslope.iloc[x]
-    slope = slope.fillna(value=0)
-    slope = pd.DataFrame(slope, columns=['slopeBD'])
-    return slope
+    df = df[['date', 'chainID', 'quantity', 'styleNumber']]
+    chains = df['chainID'].unique()
+    slope = pd.DataFrame(columns=['slopeBD'], index=df.index)
+    slope[['date','styleNumber','chainID']] = df[['date','styleNumber','chainID']]
 
-def featureplcCD(df, id):
+    for chain in chains:
+        chaindf = df[df.chainID == chain]
+        styles = chaindf['styleNumber'].unique()
+        chaindata = slope[slope.chainID == chain]
+        for style in styles:
+            styledf = chaindf[chaindf.styleNumber == style]
+            styledf = styledf.groupby('date', as_index=False).sum(numeric_only = True)
+            styledf['chainID'] = chain
+            prev = styledf[['date', 'quantity']].shift(periods = 1)
+            timedifference = (styledf['date'] - prev['date']).dt.days
+            timedifference = timedifference.fillna(value=1)
+            timedifference.iloc[0] = 1
+            styleslope = (styledf['quantity'] - prev['quantity'])/timedifference
+            styledata = chaindata[chaindata.styleNumber == style]
+            for x in styleslope.index:
+                datedata = styledata[styledata.date == styledf['date'].iloc[x]]
+                datedata['slopeBD'] = styleslope.iloc[x]
+                slope.update(datedata)
+    slope['slopeBD'] = slope['slopeBD'].fillna(value=0)
+    return slope['slopeBD']
+
+def featureplcCD(df):
     #Denne giver mindre udslag i hældningerne og burde give et mere korrekt udtryk, men den kan ikke produceres for dags dato
-    if id in df.productID:
-        df = df[df.productID == id]
-        df = df[df.styleNumber == df['styleNumber'].iloc[0]]
-    else:
-        df = df[df.styleNumber == id]
     df = df[df.quantity >= 0]
-    df = df.groupby('date', as_index=False).sum()
-    prev = df.shift(periods = 1)
-    next = df.shift(periods=-1)
-    test = next['date'] - prev['date']
-    timedif = pd.DataFrame(columns=['date'], index=test.index)
-    test = test.fillna(value=1)
-    for x in test.index:
-        timedif.iloc[x] = int(test.iloc[x].days)
-    timedif.iloc[0] = 1
-    timedif.iloc[-1] = 1
-    tempslope = (next['quantity'] - prev['quantity'])/timedif['date']
-    slope = tempslope.reindex(df['date'])
-    for x in tempslope.index:
-        slope.iloc[x] = tempslope.iloc[x]
-    slope = slope.fillna(value=0)
-    slope = pd.DataFrame(slope, columns=['slopeCD'])
-    return slope
+    df = df[['date', 'chainID', 'quantity', 'styleNumber']]
+    chains = df['chainID'].unique()
+    slope = pd.DataFrame(columns=['slopeCD'], index=df.index)
+    slope[['date','styleNumber','chainID']] = df[['date','styleNumber','chainID']]
 
-def featurealder(df, id):
-    if id in df.productID:
-        df = df[df.productID == id]
-    else:
-        df = df[df.styleNumber == id]
-    df = df[df.quantity >= 0]
-    firstdate = df['date'].iloc[0]
-    lifetimetemp = pd.DataFrame(columns=['lifetime'], index=df.index)
-    for x in lifetimetemp.index:
-        lifetimetemp.loc[x] = int((df['date'].loc[x] - firstdate).days)
-    lifetime = lifetimetemp.reindex(df['date'])
-    for x in range(0, lifetimetemp.shape[0]):
-        lifetime.iloc[x] = lifetimetemp.iloc[x]
-    today = pd.DataFrame([int((pd.to_datetime('today') - firstdate).days)], index=[pd.to_datetime('today')], columns=['lifetime'])
-    lifetime = pd.concat([lifetime, today])
-    return(lifetime)
+    for chain in chains:
+        chaindf = df[df.chainID == chain]
+        styles = chaindf['styleNumber'].unique()
+        chaindata = slope[slope.chainID == chain]
+        for style in styles:
+            styledf = chaindf[chaindf.styleNumber == style]
+            styledf = styledf.groupby('date', as_index=False).sum(numeric_only = True)
+            styledf['chainID'] = chain
+            prev = styledf[['date', 'quantity']].shift(periods = 1)
+            next = styledf[['date', 'quantity']].shift(periods = -1)
+            timedifference = (next['date'] - prev['date']).dt.days
+            timedifference = timedifference.fillna(value=1)
+            timedifference.iloc[0] = 1
+            styleslope = (next['quantity'] - prev['quantity'])/timedifference
+            styledata = chaindata[chaindata.styleNumber == style]
+            for x in styleslope.index:
+                midlertidigdato = styledata[styledata.date == styledf['date'].iloc[x]]
+                midlertidigdato['slopeCD'] = styleslope.iloc[x]
+                slope.update(midlertidigdato)
+    slope['slopeCD'] = slope['slopeCD'].fillna(value=0)
+    return slope['slopeCD']
 
-def featureacceleration(df, id):
-    if id in df.productID:
-        df = df[df.productID == id]
-    else:
-        df = df[df.styleNumber == id]
+def featurealder(df):
     df = df[df.quantity >= 0]
-    df = df.groupby('date', as_index=False).sum()
-    prev = df.shift(periods=1)
-    test = df['date'] - prev['date']
-    timedif = pd.DataFrame(columns=['date'], index=test.index)
-    test = test.fillna(value=1)
-    for x in test.index:
-        timedif.iloc[x] = int(test.iloc[x].days)
-    timedif.iloc[0] = 1
-    slope = (df['quantity'] - prev['quantity']) / timedif['date']
-    slope = slope.fillna(value=0)
-    slope = pd.DataFrame(slope, columns=['slope'])
-    prev = slope.shift(periods=1)
-    tempaccel = (slope['slope'] - prev['slope'])/timedif['date']
-    acceleration = tempaccel.reindex(slope.index)
-    for x in tempaccel.index:
-        acceleration.iloc[x] = tempaccel.iloc[x]
+    lifetimes = pd.DataFrame(columns=[['lifetimeChain', 'lifetimeRetailer']], index=df.index)
+    lifetimes[['styleNumber', 'date', 'chainID', 'retailerID']] = df[['styleNumber', 'date', 'chainID', 'retailerID']]
+    chains = df['chainID'].unique()
+
+    for chain in chains:
+        chaindf = df[df.chainID == chain]
+        styles = chaindf['styleNumber'].unique()
+        chaindata = lifetimes[lifetimes.chainID == chain]
+        for style in styles:
+            styledata = chaindata[chaindata.styleNumber == style]
+            firstdate = styledata['date'].iloc[0]
+            for x in styledata.index:
+                lifetimes['lifetimeChain'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
+
+    retailers = df['retailerID'].unique()
+    for retailer in retailers:
+        retailerdf = df[df.retailerID == retailer]
+        styles = retailerdf['styleNumber'].unique()
+        for style in styles:
+            styledata = retailerdf[retailerdf.styleNumber == style]
+            firstdate = styledata['date'].iloc[0]
+            for x in styledata.index:
+                lifetimes['lifetimeRetailer'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
+
+    return lifetimes[['lifetimeChain', 'lifetimeRetailer']]
+
+def featureacceleration(df):
+    df = df[df.quantity >= 0]
+    df = df[['date', 'chainID', 'quantity', 'styleNumber', 'retailerID']]
+    chains = df['chainID'].unique()
+    acceleration = pd.DataFrame(columns=['accelerationChainStyle', 'accelerationRetailerStyle'], index=df.index)
+    acceleration[['date', 'styleNumber', 'chainID', 'retailerID']] = df[['date', 'styleNumber', 'chainID', 'retailerID']]
+
+    for chain in chains:
+        chaindf = df[df.chainID == chain]
+        styles = chaindf['styleNumber'].unique()
+        chaindata = acceleration[acceleration.chainID == chain]
+        for style in styles:
+            styledf = chaindf[chaindf.styleNumber == style]
+            styledf = styledf.groupby('date', as_index=False).sum(numeric_only=True)
+            styledf['chainID'] = chain
+            prev = styledf[['date', 'quantity']].shift(periods=1)
+            timedifference = (styledf['date'] - prev['date']).dt.days
+            timedifference = timedifference.fillna(value=1)
+            styleslope = (styledf['quantity'] - prev['quantity']) / timedifference
+            styleslope = styleslope.fillna(value=1)
+            #Nu vi har en hastighed søger vi en acceleration
+            prev = styleslope.shift(periods=1)
+            prev = prev.fillna(value=1)
+            tempaccel = (styleslope - prev) / timedifference
+            styledata = chaindata[chaindata.styleNumber == style]
+            for x in tempaccel.index:
+                datedata = styledata[styledata.date == styledf['date'].iloc[x]]
+                datedata['accelerationChainStyle'] = tempaccel.iloc[x]
+                acceleration.update(datedata)
+
+    retailers = df['retailerID'].unique()
+    for retailer in retailers:
+         retailerdf = df[df.retailerID == retailer]
+         styles = retailerdf['styleNumber'].unique()
+         retailerdata = acceleration[acceleration.retailerID == retailer]
+         for style in styles:
+             styledf = retailerdf[retailerdf.styleNumber == style]
+             styledf = styledf.groupby('date', as_index=False).sum(numeric_only=True)
+             styledf['retailerID'] = retailer
+             prev = styledf[['date', 'quantity']].shift(periods=1)
+             timedifference = (styledf['date'] - prev['date']).dt.days
+             timedifference = timedifference.fillna(value=1)
+             styleslope = (styledf['quantity'] - prev['quantity']) / timedifference
+             styleslope = styleslope.fillna(value=1)
+             # Nu vi har en hastighed søger vi en acceleration
+             prev = styleslope.shift(periods=1)
+             prev = prev.fillna(value=1)
+             tempaccel = (styleslope - prev) / timedifference
+             styledata = retailerdata[retailerdata.styleNumber == style]
+             for x in styleslope.index:
+                 datedata = styledata[styledata.date == styledf['date'].iloc[x]]
+                 datedata['accelerationRetailerStyle'] = tempaccel.iloc[x]
+                 acceleration.update(datedata)
     acceleration = acceleration.fillna(value=0)
-    return acceleration
+    return acceleration[['accelerationChainStyle', 'accelerationRetailerStyle']]
 
 
 
@@ -308,7 +474,7 @@ def make_feature_col(df, window = '7d'):
 
     data[col_name] = tuple(map(lambda color, date: cfp.get_color_popularity(color = color, date = date), data['colorname'], data['date']))
 
-    return data
+    return data['color_popularity']
 
 def get_feature_name():
     return col_name
@@ -461,69 +627,64 @@ class SizeFeature:
 
 # samsoe women : http://www.sizeguide.net/womens-clothing-sizes-international-conversion-chart.html
 # http://www.samsoe.com/da/support/size-guide/mens-jeans.html
- 
 
-    def get_size_feature(self, size, chainid, male = False):
-        if chainid == 1:
+    def get_size_feature(self, size, chainID, male = False):
+        if chainID == 1:
             return self.mapping_ch1[size]
-        elif chainid == 2:
+        elif chainID == 2:
             if male:
                 return self.mapping_ch2_m[size]
             else:
                 return self.mapping_ch2_w[size]
-        elif chainid == 3:
+        elif chainID == 3:
             return self.mapping_ch3[size]
         else: 
-            return 8888 
+            return 8888
 
 # requires that chainid and ismale is present
 def make_sizefeature_col(df):
     sf = SizeFeature()
 
     data = df.copy()
-    data['size_scale'] = tuple(map(lambda size, chainid, ismale: sf.get_size_feature(size=size, chainid = chainid, male = ismale), data['size'], data['chainid'], date['ismale']))
-    return data
+    data['size_scale'] = tuple(map(lambda size, chainID, ismale: sf.get_size_feature(size=size, chainID = chainID, male = ismale), data['size'], data['chainID'], data['ismale']))
+    return data['size_scale']
+
+def featurize(df, path):
+    functionlist = {'quantityChain':today_quantity, 'turnoverChain':today_turnover, 'month_feat': month_feature,
+                    'month_change_dist':month_change_dist_feature, 'month_first_dist':month_first_dist_feature,
+                    'month_next_first_dist': month_next_first_dist_feature, 'quantity7d':week_quantity_feature,
+                    'quantity30d':month_quantity_feature, 'weekday':weekday_feature, 'discount_percent':discount_to_percent,
+                    'avg_price_style':get_avg_price_in_style, 'color':make_feature_col, 'age':featurealder,
+                    'acceleration':featureacceleration, 'size':make_sizefeature_col,
+                    'PLCBD':featureplcBD, 'PLCCD':featureplcCD, 'stigning_Periode':stigning_period}
 
 
-mens_itemgroup = ['MEN - ACCESSORIES',
-                'MEN - BASIC - DON\'T USE',
-                'MEN - BELTS/SCARF/TIE',
-                'MEN - BLAZER',
-                'MEN - CARDIGAN',
-                'MEN - JACKETS',
-                'MEN - JEANS',
-                'MEN - KNIT',
-                'MEN - PANTS',
-                'MEN - POLO',
-                'MEN - SHIRTS',
-                'MEN - SHOES', 
-                'MEN - SHORTS',
-                'MEN - SWEAT',               
-                'MEN - T-SHIRTS',            
-                'MEN - UNDERWEAR/SOCKS']    
-
-def is_male(itemgroupname):
-    return 1 if itemgroupname in mens_itemgroup else 0
-
-def make_ismale_col(df):
-    data = df.copy()
-    data['ismale'] = tuple(map(lambda itemgroup: is_male(itemgroup), data['SupplierItemgroupName']))
-    return data
-
-def make_isfemale_col(df):
-    data = df.copy()
-    data['isfemale'] = tuple(map(lambda itemgroup: 1 - is_male(itemgroup), data['SupplierItemgroupName']))
-    return data
-
+    featuredf = weekday_feature(df)
+    for func in functionlist:
+        print(func)
+        temp = functionlist[func](df)
+        if isinstance(temp, pd.DataFrame):
+            featuredf[temp.columns] = temp
+        if isinstance(temp, pd.Series):
+            featuredf[func] = temp
+    featuredf = featuredf.fillna(value = 9999)
+    return featuredf.to_csv(path_or_buf=path + 'Features.rpt', index=False, sep=';', encoding='utf-8')
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
 
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
-kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt'
+kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
+patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
 
-dataframe = dl.load_sales_file(kloster_dir)
+dataframe = dl.load_sales_file(patrick_dir + 'CleanedData.rpt')
 
-print(get_avg_price_in_style(dataframe))
+# dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
+# dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
+# dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
-print(create_avg_list(dataframe))
+print(featurize(dataframe, patrick_dir))
+
+dataframeother = dl.load_feature_file(patrick_dir + 'Features.rpt')
+
+print(dataframeother)

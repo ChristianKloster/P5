@@ -4,3 +4,9 @@ CleanData/CleanedData.rpt
 CleanData/CleanedData.rpt
 
 CleanData/CleanedData_New\.rpt
+
+CleanData/CleanedData_Old\.rpt
+
+\.idea/workspace\.xml
+
+pyScripts/__pycache__/dataloader\.cpython-36\.pyc

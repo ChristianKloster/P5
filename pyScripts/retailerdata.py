@@ -12,6 +12,10 @@ class retailerData:
 		s = self.df[self.df.id == id]
 		return s['chainid'].get_value(s.first_valid_index())
 
+	def get_chainnumber(self, id): #a little faster than get_chainnumber_from_retailerid (I THINK)
+		s = self.df[self.df.id == id]
+		return s.loc[s['id'] == id, 'chainid']
+
 	def get_region_from_retailerid(self, id):
 		s = self.df[self.df.id == id]
 		return s['region'].get_value(s.first_valid_index())
