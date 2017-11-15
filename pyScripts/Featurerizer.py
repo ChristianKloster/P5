@@ -10,34 +10,36 @@ def today_turnover(df):
     todayturnover = pd.DataFrame(columns=['turnoverChain'], index=df.index)
     todayturnover[['date', 'chainID', 'turnover']] = df[['date', 'chainID', 'turnover']]
     chains = todayturnover['chainID'].unique()
+    datedata = pd.DataFrame(columns=[['date', 'chainID', 'quantityChain']])
 
     for chain in chains:
         chaindf = todayturnover[todayturnover.chainID == chain]
         chaindf = chaindf.groupby('date', as_index=False).sum(numeric_only = True)
-        chaindata = todayturnover[todayturnover.chainID == chain]
-        for x in chaindf.index:
-            datedata = chaindata[chaindata.date == chaindf['date'].iloc[x]]
-            datedata['turnoverChain'] = chaindf['turnover'].iloc[x]
-            todayturnover.update(datedata)
+        chaindf['turrnoverChain'] = chaindf['turnover']
+        chaindf['chainID'] = chain
+        chaindf = chaindf[['date', 'chainID', 'turnoverChain']]
+        datedata = datedata.append(chaindf)
+        todayturnover.merge(datedata)
     return todayturnover['turnoverChain']
 
 def today_quantity(df):
     todayquantity = pd.DataFrame(columns=['quantityChain'], index=df.index)
     todayquantity[['date', 'chainID', 'quantity', 'productID']] = df[['date', 'chainID', 'quantity', 'productID']]
     chains = todayquantity['chainID'].unique()
+    datedata = pd.DataFrame(columns=[['date', 'chainID', 'productID', 'quantityChain']])
 
     for chain in chains:
         chaindf = todayquantity[todayquantity.chainID == chain]
         products = chaindf['productID'].unique()
-        chaindata = todayquantity[todayquantity.chainID == chain]
         for product in products:
             productdf = chaindf[chaindf.productID == product]
-            productdf = productdf.groupby('date', as_index=False).sum(numeric_only = True)
-            productdata = chaindata[chaindata.productID == product]
-            for x in productdf.index:
-                datedata = productdata[productdata.date == productdf['date'].iloc[x]]
-                datedata['quantityChain'] = productdf['quantity'].iloc[x]
-                todayquantity.update(datedata)
+            productdf = productdf.groupby('date', as_index=False).sum()
+            productdf['quantityChain'] = productdf['quantity']
+            productdf['productID'] = product
+            productdf['chainID'] = chain
+            productdf = productdf[['chainID', 'date' ,'productID', 'quantityChain']]
+            datedata = datedata.append(productdf)
+    todayquantity.merge(datedata)
     return todayquantity['quantityChain']
 
 def quantity_period(df, number_periods = 3, length_period = 4):
@@ -324,7 +326,7 @@ def featureplcBD(df):
             for x in styleslope.index:
                 datedata = styledata[styledata.date == styledf['date'].iloc[x]]
                 datedata['slopeBD'] = styleslope.iloc[x]
-                slope.update(datedata)
+            slope.update(datedata)
     slope['slopeBD'] = slope['slopeBD'].fillna(value=0)
     return slope['slopeBD']
 
@@ -354,7 +356,7 @@ def featureplcCD(df):
             for x in styleslope.index:
                 midlertidigdato = styledata[styledata.date == styledf['date'].iloc[x]]
                 midlertidigdato['slopeCD'] = styleslope.iloc[x]
-                slope.update(midlertidigdato)
+            slope.update(midlertidigdato)
     slope['slopeCD'] = slope['slopeCD'].fillna(value=0)
     return slope['slopeCD']
 
@@ -650,23 +652,26 @@ def make_sizefeature_col(df):
     return data['size_scale']
 
 def featurize(df, path):
-    functionlist = {'quantityChain':today_quantity, 'turnoverChain':today_turnover, 'month_feat': month_feature,
-                    'month_change_dist':month_change_dist_feature, 'month_first_dist':month_first_dist_feature,
-                    'month_next_first_dist': month_next_first_dist_feature, 'quantity7d':week_quantity_feature,
-                    'quantity30d':month_quantity_feature, 'weekday':weekday_feature, 'discount_percent':discount_to_percent,
-                    'avg_price_style':get_avg_price_in_style, 'color':make_feature_col, 'age':featurealder,
-                    'acceleration':featureacceleration, 'size':make_sizefeature_col,
-                    'PLCBD':featureplcBD, 'PLCCD':featureplcCD, 'stigning_Periode':stigning_period}
+    functionlist = {'quantityChain':today_quantity, 'turnoverChain':today_turnover}#, 'month_feat': month_feature,
+                    # 'month_change_dist':month_change_dist_feature, 'month_first_dist':month_first_dist_feature,
+                    # 'month_next_first_dist': month_next_first_dist_feature, 'quantity7d':week_quantity_feature,
+                    # 'quantity30d':month_quantity_feature, 'weekday':weekday_feature, 'discount_percent':discount_to_percent,
+                    # 'avg_price_style':get_avg_price_in_style, 'color':make_feature_col, 'age':featurealder,
+                    # 'acceleration':featureacceleration, 'size':make_sizefeature_col,
+                    # 'PLCBD':featureplcBD, 'PLCCD':featureplcCD, 'stigning_Periode':stigning_period}
 
 
     featuredf = weekday_feature(df)
     for func in functionlist:
         print(func)
         temp = functionlist[func](df)
+        print(temp.isnull().values.any())
         if isinstance(temp, pd.DataFrame):
             featuredf[temp.columns] = temp
+            print(featuredf.isnull.any())
         if isinstance(temp, pd.Series):
             featuredf[func] = temp
+            print(featuredf.isnull().values.any())
     featuredf = featuredf.fillna(value = 9999)
     return featuredf.to_csv(path_or_buf=path + 'Features.rpt', index=False, sep=';', encoding='utf-8')
 #----------------------------------------------------------------------------------------------------------#
@@ -679,12 +684,28 @@ patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
 
 dataframe = dl.load_sales_file(patrick_dir + 'CleanedData.rpt')
 
-# dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
-# dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
-# dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
+dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
+dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
+dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
-print(featurize(dataframe, patrick_dir))
+# chains = dataframe['chainID'].unique()
+# print('chains: {0}'.format(len(chains)))
+# for chain in chains:
+#     chaindf = dataframe[dataframe.chainID == chain]
+#     products = chaindf['productID'].unique()
+#     chaindata = dataframe[dataframe.chainID == chain]
+#     print('products: {0}'.format(len(products)))
+#     for product in products:
+#         productdf = chaindf[chaindf.productID == product]
+#         productdf = productdf.groupby('date', as_index=False).sum(numeric_only=True)
+#         productdata = chaindata[chaindata.productID == product]
+#         print('prod by date: {0}'.format(len(productdf)))
+#         for x in productdf.index:
+#             datedata = productdata[productdata.date == productdf['date'].iloc[x]]
+#             datedata['quantityChain'] = productdf['quantity'].iloc[x]
 
-dataframeother = dl.load_feature_file(patrick_dir + 'Features.rpt')
+print(featurize(dataframetest, patrick_dir))
 
-print(dataframeother)
+# dataframeother = dl.load_feature_file(patrick_dir + 'Features.rpt')
+
+# print(dataframeother)
