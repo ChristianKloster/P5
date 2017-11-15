@@ -360,33 +360,47 @@ def featureplcCD(df):
     slope['slopeCD'] = slope['slopeCD'].fillna(value=0)
     return slope['slopeCD']
 
-def featurealder(df):
-    df = df[df.quantity >= 0]
-    lifetimes = pd.DataFrame(columns=[['lifetimeChain', 'lifetimeRetailer']], index=df.index)
-    lifetimes[['styleNumber', 'date', 'chainID', 'retailerID']] = df[['styleNumber', 'date', 'chainID', 'retailerID']]
-    chains = df['chainID'].unique()
+# def featurealder(df):
+#     df = df[df.quantity >= 0]
+#     lifetimes = pd.DataFrame(columns=[['lifetimeChain', 'lifetimeRetailer']], index=df.index)
+#     lifetimes[['styleNumber', 'date', 'chainID', 'retailerID']] = df[['styleNumber', 'date', 'chainID', 'retailerID']]
+#     chains = df['chainID'].unique()
 
-    for chain in chains:
-        chaindf = df[df.chainID == chain]
-        styles = chaindf['styleNumber'].unique()
-        chaindata = lifetimes[lifetimes.chainID == chain]
-        for style in styles:
-            styledata = chaindata[chaindata.styleNumber == style]
-            firstdate = styledata['date'].iloc[0]
-            for x in styledata.index:
-                lifetimes['lifetimeChain'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
+#     for chain in chains:
+#         chaindf = df[df.chainID == chain]
+#         styles = chaindf['styleNumber'].unique()
+#         chaindata = lifetimes[lifetimes.chainID == chain]
+#         for style in styles:
+#             styledata = chaindata[chaindata.styleNumber == style]
+#             firstdate = styledata['date'].iloc[0]
+#             for x in styledata.index:
+#                 lifetimes['lifetimeChain'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
 
-    retailers = df['retailerID'].unique()
-    for retailer in retailers:
-        retailerdf = df[df.retailerID == retailer]
-        styles = retailerdf['styleNumber'].unique()
-        for style in styles:
-            styledata = retailerdf[retailerdf.styleNumber == style]
-            firstdate = styledata['date'].iloc[0]
-            for x in styledata.index:
-                lifetimes['lifetimeRetailer'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
+#     retailers = df['retailerID'].unique()
+#     for retailer in retailers:
+#         retailerdf = df[df.retailerID == retailer]
+#         styles = retailerdf['styleNumber'].unique()
+#         for style in styles:
+#             styledata = retailerdf[retailerdf.styleNumber == style]
+#             firstdate = styledata['date'].iloc[0]
+#             for x in styledata.index:
+#                 lifetimes['lifetimeRetailer'].loc[x] = int((styledata['date'].loc[x] - firstdate).days)
 
-    return lifetimes[['lifetimeChain', 'lifetimeRetailer']]
+#     return lifetimes[['lifetimeChain', 'lifetimeRetailer']]
+
+# laver alder på stylenumber baseret på df
+def feature_age(df):
+    data = df[['date', 'styleNumber']].copy()
+
+    firstdates = data.groupby('styleNumber').first()
+    print(firstdates)
+
+    data['first'] = tuple(map(lambda style: firstdates.loc[style,'date'], data['styleNumber']))
+    data['styleage'] = (data['date'] - data['first']).dt.days
+
+    return data['styleage']
+
+
 
 def featureacceleration(df):
     df = df[df.quantity >= 0]
@@ -681,8 +695,9 @@ def featurize(df, path):
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
 kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
+ng_dir = r'C:\P5GIT\\'
 
-dataframe = dl.load_sales_file(patrick_dir + 'CleanedData.rpt')
+dataframe = dl.load_sales_file(ng_dir + 'CleanedData.rpt')
 
 dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
 dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
@@ -703,8 +718,10 @@ dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D
 #         for x in productdf.index:
 #             datedata = productdata[productdata.date == productdf['date'].iloc[x]]
 #             datedata['quantityChain'] = productdf['quantity'].iloc[x]
+print(dataframetest)
+print(feature_age(dataframetest))
 
-print(featurize(dataframetest, patrick_dir))
+# print(featurize(dataframetest, patrick_dir))
 
 # dataframeother = dl.load_feature_file(patrick_dir + 'Features.rpt')
 

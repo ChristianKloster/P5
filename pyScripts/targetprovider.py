@@ -9,7 +9,7 @@ def get_pivot_tables_with_target_values(df, retailerid = 2, days = '1W', on = 'p
 	data = data[['date', on, 'quantity']]
 
 	p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0).resample(days).sum()
-	p2 = p.shift(-1).fillna(0)
+	p2 = p.shift(1).fillna(0)
 
 	return p, p2
 
