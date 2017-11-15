@@ -654,8 +654,7 @@ def featurize(df, path):
                     'month_change_dist':month_change_dist_feature, 'month_first_dist':month_first_dist_feature,
                     'month_next_first_dist': month_next_first_dist_feature, 'quantity7d':week_quantity_feature,
                     'quantity30d':month_quantity_feature, 'weekday':weekday_feature, 'discount_percent':discount_to_percent,
-                    'avg_price_style':get_avg_price_in_style, 'color':make_feature_col,
-                    #'age':featurealder,
+                    'avg_price_style':get_avg_price_in_style, 'color':make_feature_col, 'age':featurealder,
                     'acceleration':featureacceleration, 'size':make_sizefeature_col,
                     'PLCBD':featureplcBD, 'PLCCD':featureplcCD, 'stigning_Periode':stigning_period}
 
@@ -668,7 +667,7 @@ def featurize(df, path):
             featuredf[temp.columns] = temp
         if isinstance(temp, pd.Series):
             featuredf[func] = temp
-
+    featuredf = featuredf.fillna(value = 9999)
     return featuredf.to_csv(path_or_buf=path + 'Features.rpt', index=False, sep=';', encoding='utf-8')
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
@@ -680,11 +679,12 @@ patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
 
 dataframe = dl.load_sales_file(patrick_dir + 'CleanedData.rpt')
 
-# dataframe = dl.load_feature_file(patrick_dir + 'Features.rpt')
+# dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
+# dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
+# dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
-dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
-dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
-dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
+print(featurize(dataframe, patrick_dir))
 
-print(featurize(dataframetest, patrick_dir))
+dataframeother = dl.load_feature_file(patrick_dir + 'Features.rpt')
 
+print(dataframeother)
