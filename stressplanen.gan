@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2017-11-30" view-index="0" gantt-divider-location="361" resource-divider-location="300" version="2.8.5" locale="da">
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2017-11-14" view-index="0" gantt-divider-location="361" resource-divider-location="300" version="2.8.1" locale="en_US">
     <description/>
-    <view zooming-state="default:2" id="gantt-chart">
-        <field id="tpd3" name="Navn" width="202" order="0"/>
-        <field id="tpd4" name="Start dato" width="78" order="1"/>
-        <field id="tpd5" name="Slut dato" width="77" order="2"/>
+    <view zooming-state="default:3" id="gantt-chart">
+        <field id="tpd3" name="Name" width="202" order="0"/>
+        <field id="tpd4" name="Begin date" width="78" order="1"/>
+        <field id="tpd5" name="End date" width="77" order="2"/>
     </view>
     <view id="resource-table">
-        <field id="0" name="Navn" width="210" order="0"/>
-        <field id="1" name="Standard rolle" width="86" order="1"/>
+        <field id="0" name="Name" width="210" order="0"/>
+        <field id="1" name="Default role" width="86" order="1"/>
     </view>
     <!-- -->
     <calendars>
@@ -34,7 +34,8 @@
             <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
         </taskproperties>
         <task id="0" name="Rapport aflevering" color="#8cb6ce" meeting="true" start="2017-12-21" duration="0" complete="0" expand="true"/>
-        <task id="2" name="Rapport retning" meeting="false" start="2017-12-18" duration="3" complete="0" expand="true"/>
+        <task id="20" name="konklusion + disc" meeting="false" start="2017-12-11" duration="5" complete="0" expand="true"/>
+        <task id="2" name="Rapport retning" meeting="false" start="2017-12-18" duration="4" complete="0" expand="true"/>
         <task id="4" name="Framework" color="#8cb6ce" meeting="false" start="2017-11-15" duration="2" complete="0" expand="true"/>
         <task id="6" name="Featurizer" meeting="false" start="2017-11-15" duration="6" complete="0" expand="true"/>
         <task id="7" name="dataanalyse" meeting="false" start="2017-11-20" duration="5" complete="0" expand="true"/>

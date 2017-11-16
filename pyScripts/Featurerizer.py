@@ -6,42 +6,90 @@ import time
 import numpy as np
 import calendar
 
-def today_turnover(df):
-    todayturnover = pd.DataFrame(columns=['turnoverChain'], index=df.index)
-    todayturnover[['date', 'chainID', 'turnover']] = df[['date', 'chainID', 'turnover']]
-    chains = todayturnover['chainID'].unique()
-    datedata = pd.DataFrame(columns=[['date', 'chainID', 'quantityChain']])
 
-    for chain in chains:
-        chaindf = todayturnover[todayturnover.chainID == chain]
-        chaindf = chaindf.groupby('date', as_index=False).sum(numeric_only = True)
-        chaindf['turrnoverChain'] = chaindf['turnover']
-        chaindf['chainID'] = chain
-        chaindf = chaindf[['date', 'chainID', 'turnoverChain']]
-        datedata = datedata.append(chaindf)
-        todayturnover.merge(datedata)
-    return todayturnover['turnoverChain']
+# finder det samlede turnover for en kæde for hver dag
+# def today_turnover(df):
+#     todayturnover = pd.DataFrame(columns=['turnoverChain'], index=df.index)
+#     todayturnover[['date', 'chainID', 'turnover']] = df[['date', 'chainID', 'turnover']]
+#     chains = todayturnover['chainID'].unique()
+#     datedata = pd.DataFrame(columns=[['date', 'chainID', 'quantityChain']])
 
-def today_quantity(df):
-    todayquantity = pd.DataFrame(columns=['quantityChain'], index=df.index)
-    todayquantity[['date', 'chainID', 'quantity', 'productID']] = df[['date', 'chainID', 'quantity', 'productID']]
-    chains = todayquantity['chainID'].unique()
-    datedata = pd.DataFrame(columns=[['date', 'chainID', 'productID', 'quantityChain']])
+#     for chain in chains:
+#         chaindf = todayturnover[todayturnover.chainID == chain]
+#         chaindf = chaindf.groupby('date', as_index=False).sum(numeric_only = True)
+#         chaindf['turrnoverChain'] = chaindf['turnover']
+#         chaindf['chainID'] = chain
+#         chaindf = chaindf[['date', 'chainID', 'turnoverChain']]
+#         datedata = datedata.append(chaindf)
+#         todayturnover.merge(datedata)
+#     return todayturnover['turnoverChain']
 
-    for chain in chains:
-        chaindf = todayquantity[todayquantity.chainID == chain]
-        products = chaindf['productID'].unique()
-        for product in products:
-            productdf = chaindf[chaindf.productID == product]
-            productdf = productdf.groupby('date', as_index=False).sum()
-            productdf['quantityChain'] = productdf['quantity']
-            productdf['productID'] = product
-            productdf['chainID'] = chain
-            productdf = productdf[['chainID', 'date' ,'productID', 'quantityChain']]
-            datedata = datedata.append(productdf)
-    todayquantity.merge(datedata)
-    return todayquantity['quantityChain']
+# total turnover in distinct periods
+def total_turnover_in_period_agg(df, period = 'W-SUN'):
+    data = df[['date', 'turnover']].copy()
 
+    turnover_by_date = data.groupby('date').sum()
+    # total turnover for previous period.
+    summed_turnover = turnover_by_date.resample(period).sum().shift(1).fillna(0)
+
+    # reindex to get all dates. values are filled forward
+    result = summed_turnover.reindex(turnover_by_date.index, method='pad').fillna(0)
+
+    data['total_turnover'] = tuple(map(lambda date: result.loc[date, 'turnover'], data['date']))
+    return data['total_turnover']
+
+# total turnover in rolling periods
+def total_turnover_in_period_rolling(df, period = '7D'):
+    data = df[['date', 'turnover']].copy()
+
+    turnover_by_date = data.groupby('date').sum().rolling(period).sum().shift(1).fillna(0)
+    data['total_turnover'] = tuple(map(lambda date: turnover_by_date.loc[date, 'turnover'], data['date']))
+    return data['total_turnover']
+
+# total quantity in distinct periods
+def total_quantity_in_period_agg(df, period = 'W-SUN'):
+    data = df[['date', 'quantity']].copy()
+
+    quantity_by_date = data.groupby('date').sum()
+    # total quantity for previous period.
+    summed_quantity = quantity_by_date.resample(period).sum().shift(1).fillna(0)
+
+    # reindex to get all dates. values are filled forward
+    result = summed_quantity.reindex(quantity_by_date.index, method='pad').fillna(0)
+
+    data['total_quantity'] = tuple(map(lambda date: result.loc[date, 'quantity'], data['date']))
+    return data['total_quantity']
+
+# total quantity in rolling periods
+def total_quantity_in_period_rolling(df, period = '7D'):
+    data = df[['date', 'quantity']].copy()
+
+    quantity_by_date = data.groupby('date').sum().rolling(period).sum().shift(1).fillna(0)
+    data['total_quantity'] = tuple(map(lambda date: quantity_by_date.loc[date, 'quantity'], data['date']))
+    return data['total_quantity']
+
+# finder det samlede quantity for en kæde for hver dag
+# def today_quantity(df):
+#     todayquantity = pd.DataFrame(columns=['quantityChain'], index=df.index)
+#     todayquantity[['date', 'chainID', 'quantity', 'productID']] = df[['date', 'chainID', 'quantity', 'productID']]
+#     chains = todayquantity['chainID'].unique()
+#     datedata = pd.DataFrame(columns=[['date', 'chainID', 'productID', 'quantityChain']])
+
+#     for chain in chains:
+#         chaindf = todayquantity[todayquantity.chainID == chain]
+#         products = chaindf['productID'].unique()
+#         for product in products:
+#             productdf = chaindf[chaindf.productID == product]
+#             productdf = productdf.groupby('date', as_index=False).sum()
+#             productdf['quantityChain'] = productdf['quantity']
+#             productdf['productID'] = product
+#             productdf['chainID'] = chain
+#             productdf = productdf[['chainID', 'date' ,'productID', 'quantityChain']]
+#             datedata = datedata.append(productdf)
+#     todayquantity.merge(datedata)
+#     return todayquantity['quantityChain']
+
+# finder antal solgte varer på produkt/butik niveau over x perioder af y dage
 def quantity_period(df, number_periods = 3, length_period = 4):
     col_list = ["date", "quantity", "retailerID", "productID"]
     period_col = []
@@ -67,6 +115,25 @@ def quantity_period(df, number_periods = 3, length_period = 4):
 
     return quantityPerioddf[period_col]
 
+def quantity_in_periods_agg(df, period = 'W-SUN', n = 3, on ='productID'):
+    data = df[['date', on, 'quantity']].copy()
+    dates = data['date'].unique()
+
+    p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0).resample(period).sum()
+
+    col_names = []
+    for i in range(0,n):
+        result = p.shift(i+1).reindex(dates, method='pad').fillna(0)
+        col_name = 'quantity_p' + str(i)
+        col_names.append(col_name)
+        data[col_name] = tuple(map(lambda date, label: result.loc[date, label], data['date'], data[on]))
+
+    return data[col_names], col_names
+  
+
+
+
+# finder stigningen i antal solgte varer på produkt/butik niveau over x perioder af y dage
 def stigning_period(df, number_periods = 3, length_period = 4):
     col_list = ["date", "quantity", "retailerID", "productID"]
     period_col = []
@@ -499,7 +566,7 @@ def get_feature_name():
 class SizeFeature:
     def __init__(self):
 
-# disse bør nok laves til nogle tabeller vi kan præsentere:
+        # disse bør nok laves til nogle tabeller vi kan præsentere:
 
         self.mapping_ch1 = {'XS' : 1,
                             'S' : 2,
@@ -691,6 +758,31 @@ def featurize(df, path):
 #----------------------------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------------------------#
 
+def featurize2(df):
+
+    data = df.copy()
+    # global features
+
+
+
+    # chain features
+    chains = df['chainID'].unique()
+    for c in chains:
+        chain_data = data[data.chainID == c]
+
+        
+        data.loc[data.chainID == c,'total_turnover'] = total_turnover_in_period_rolling(chain_data).copy()
+
+    # retailer features
+    retailers = df['retailerID'].unique()
+    for r in retailers:
+        retailer_data = data[data.retailerID == r]
+
+        # retailer_data[]
+
+    return data
+
+
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
 kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
@@ -699,9 +791,24 @@ ng_dir = r'C:\P5GIT\\'
 
 dataframe = dl.load_sales_file(ng_dir + 'CleanedData.rpt')
 
-dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
-dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
-dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
+styles = ['Z99319B', 'Y95901D']
+dataframetest = dataframe[dataframe.styleNumber.isin(styles)]
+
+testframe = featurize2(dataframe)
+
+# dataframetest['test_feature'] = total_turnover_in_period_rolling(dataframetest)
+
+# df, col_names = quantity_in_periods_agg(dataframe)
+
+# dataframe[col_names] = df
+
+print(testframe)
+# print(feature_age(dataframetest))
+
+
+# dataframetest = dataframe[dataframe.styleNumber == 'Z99319B']
+# dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == '010668A'])
+# dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D'])
 
 # chains = dataframe['chainID'].unique()
 # print('chains: {0}'.format(len(chains)))
@@ -718,8 +825,7 @@ dataframetest = dataframetest.append(dataframe[dataframe.styleNumber == 'Y95901D
 #         for x in productdf.index:
 #             datedata = productdata[productdata.date == productdf['date'].iloc[x]]
 #             datedata['quantityChain'] = productdf['quantity'].iloc[x]
-print(dataframetest)
-print(feature_age(dataframetest))
+
 
 # print(featurize(dataframetest, patrick_dir))
 
