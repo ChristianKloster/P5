@@ -1,38 +1,49 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import DataLoad as dl
+import dataloader as dl
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.arima_model import ARIMA
+import targetprovider
 
-
-def linearmodeler(d):
+def baselinemodeler(targetTrain, featureTrain, testTarget, testFeature):
     # Setting up prediction columns
-    columns = d.columns.tolist()
-    columns = [c for c in columns if c not in ['date', 'size', 'SupplierItemgroupName', 'styleNumber', 'colorname',
-                                               'isNOS', 'styleNumber', 'description']]
-    # Store the variable we'll be predicting on.
-    target = "quantity"
-    # Generate the training set.  Set random_state to be able to replicate results.
-    train = d.sample(frac=0.8, random_state=1)
-    # Select anything not in the training set and put it in the testing set.
-    test = d.loc[~d.index.isin(train.index)]
-    # Initialize the model class.
-    lin_model = LinearRegression()
-    # Fit the model to the training data.
-    lin_model.fit(train[columns], train[target])
-    # Generate our predictions for the test set.
-    lin_predictions = lin_model.predict(test[columns])
-    print("Predictions:", lin_predictions)
-    # Compute error between our test predictions and the actual values
-    lin_mse = mean_squared_error(lin_predictions, test[target])
-    print('Coefficients: \n', lin_model.coef_)
-    print("Computed error:", lin_mse)
-    print('Variance score: %.2f' % r2_score(test[target], lin_predictions))
-    return(lin_model)
+    target = targetTrain.transpose().fillna(value=0)
+    feature = featureTrain.transpose().fillna(value=0)
+    columns = testTarget.columns.tolist()
+    results = pd.DataFrame(columns=[columns], index=target.index)
+    resultsrelationactual = pd.DataFrame(columns=[columns], index=target.index)
+    resultsrelationactual = resultsrelationactual.fillna(value=0)
+    results['variance'] = 9999
+
+    for product in results.index:
+        # Initialize the model class.
+        lin_model = LinearRegression(n_jobs=-1)
+        # Fit the model to the training data.
+        feat = feature.loc[product].values.reshape(-1, 1)
+        targ = target.loc[product].values.reshape(-1, 1)
+        testF = testFeature.loc[product]
+        testF = testF.values.reshape(-1,1)
+        testT = testTarget.loc[product]
+        lin_model.fit(feat, targ)
+        pred = lin_model.predict(testF)
+
+        # print("Predictions:", newpred)
+        # Compute error between our test predictions and the actual values
+        lin_mse = mean_squared_error(pred, testT)
+        r2 = r2_score(testT, pred)
+        score = lin_model.score(pred, testT)
+        results['variance'].loc[product] = r2
+        dumb = testT-pred[0]
+        resultsrelationactual.loc[product] = resultsrelationactual.loc[product] + dumb #results[columns].loc[product] = dumb
+        # lin_model =  tuple(map(lambda features, targets : LinearRegression().fit(features, targets), feature[columns], target[columns]))
+        # The coefficients
+        print('Coefficients for {1}: {0}'.format(lin_model.coef_, product))
+    resultsrelationactual[['variance']] = results[['variance']]
+    return  resultsrelationactual
 
 def timemodeler(ts, Id, lag = 21):
     ts_log = np.log(ts)
@@ -130,56 +141,54 @@ def test_stationarity(timeseries, Id):
 def tester():
     pass
 
-directory = 'C:/Users/Patrick/PycharmProjects/untitled/AAU/Sales_20'
-files = ['1606', '1607', '1608', '1609','1610', '1611', '1612',
-         '1701', '1702', '1703', '1704', '1705', '1706' , '1707', '1708', '1709']
-end = '.rpt'
+kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
+ng_dir = r'C:\P5GIT\\'
+patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
 
-for x in range(0,len(files)):
-	files[x] = directory + files[x] + end
+dataframe = dl.load_sales_file(patrick_dir + 'CleanedData.rpt')
 
-d = dl.loadSalesFiles(files)
-d = d.dropna(axis=0, how='any')
-d = d[d.isNOS != 1]
-d = d[d.retailerID == 42]
+dataframe = dataframe[dataframe.retailerID == 2]
+dataframe = dataframe[dataframe.isNOS != 1]
 generer_fra = 'productID'
 
-retailers = [1]#,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
-results = pd.DataFrame(columns=['productID', 'variance', 'error'], index=retailers)
-lags = [1, 2, 7, 14, 21]
-for ret in retailers:
-    a = d[generer_fra].value_counts()
-    dp = d[d[generer_fra] == a.index[ret]]
-    dp = dp.groupby(by='date').sum()
-    dp = dp.resample('W').agg({'quantity': 'sum', 'turnover': 'sum', 'discount': 'sum'})
-    dp = dp.dropna(axis=0, how='any')
-    ts = dp['quantity']
-    test_stationarity(ts, ret)
-    for lag in lags:
-        timemodeler(ts, ret, lag=lag)
-    test = dp.groupby(by='date').sum()
-    train = dp.groupby(by='date').sum()
-    test = test.resample('W').agg({'quantity': 'sum', 'turnover': 'sum', 'discount': 'sum'})
-    train = train.resample('W').agg({'quantity': 'sum', 'turnover': 'sum', 'discount': 'sum'})
-    test = test.dropna(axis=0, how='any')
-    train = train.dropna(axis=0, how='any')
-    # test = test.iloc[::-1]
-    # test = test.head(int(round(test.size * 0.1)))
-    # train = train.head(int(round(train.size * 0.9)))
+# products = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
 
-    # newmodel = linearmodeler(train)
-    # columns = train.columns.tolist()
-    # columns = [c for c in columns if c not in ['date', 'size', 'SupplierItemgroupName', 'styleNumber', 'colorname',
-    #                                            'isNOS', 'styleNumber', 'description']]
-    # newpred = newmodel.predict(test[columns])
-    # print("Predictions clean:", newpred)
-    # # Compute error between our test predictions and the actual values
-    # lin_mse = mean_squared_error(newpred, test['quantity'])
-    # print("Computed error:", lin_mse)
-    # print('Variance score: %.2f' % r2_score(test['quantity'], newpred))
-    # results.iloc[ret-1].set_value('productID', a.index[ret])
-    # results.iloc[ret-1].set_value('variance', r2_score(test['quantity'], newpred))
-    # results.iloc[ret-1].set_value('error', lin_mse)
-    # predictionrange = pd.date_range(test.index.values[-1], periods=1, freq='W')
-    # futurepred = newmodel.predict(predictionrange)
-print(results)
+
+#Different test cases for days
+quantity1D = targetprovider.get_pivot_tables_with_target_values(dataframe, retailerid = 2, days = '1D', on = 'productID')
+quantity2D = targetprovider.get_pivot_tables_with_target_values(dataframe, retailerid = 2, days = '2D', on = 'productID')
+quantity4D = targetprovider.get_pivot_tables_with_target_values(dataframe, retailerid = 2, days = '4D', on = 'productID')
+quantity1W = targetprovider.get_pivot_tables_with_target_values(dataframe, retailerid = 2, days = '1W', on = 'productID')
+#Creating train data from cases, use whichever one is wanted for testing
+traintarget = quantity1D[0]
+trainfeature = quantity1D[1]
+traintarget = traintarget.head(int(np.floor(traintarget.shape[0] * 0.9)))
+trainfeature = trainfeature.head(int(np.floor(trainfeature.shape[0] * 0.9)))
+#Creates the test data for verification
+testtarget = quantity1D[0].iloc[::-1]
+testfeature = quantity1D[1].iloc[::-1]
+testtarget = testtarget.head(int(np.ceil(testtarget.shape[0] * 0.1))).iloc[::-1]
+testfeature = testfeature.head(int(np.ceil(testfeature.shape[0] * 0.1))).iloc[::-1]
+testtarget = testtarget.transpose().fillna(value=0)
+testfeature = testfeature.transpose().fillna(value=0)
+
+# Til at teste på udsnit af dataet
+# columns = testtarget.columns.tolist()
+# traintarget = traintarget.iloc[:, [0,1]]
+# trainfeature = trainfeature.iloc[:, [0,1]]
+# testtarget = testtarget.iloc[[0,1]]
+# testfeature = testfeature.iloc[[0,1]]
+
+
+newmodel = baselinemodeler(traintarget, trainfeature, testtarget, testfeature)
+
+print(newmodel)
+# print("Predictions:", newpred)
+# Compute error between our test predictions and the actual values
+# lin_mse = mean_squared_error(newpred, test['quantity'])
+# print("Computed error:", lin_mse)
+# print('Variance score: %.2f' % r2_score(test['quantity'], newpred))
+# results.iloc[number-1].set_value('productID', a.index[number])
+# results.iloc[number-1].set_value('variance', r2_score(test['quantity'], newpred))
+# results.iloc[number-1].set_value('error', lin_mse)
+# print(results)
