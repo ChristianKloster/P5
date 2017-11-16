@@ -26,6 +26,11 @@ def make_scatteplot(df, retailerid = 2, days = '1W',on = 'productID'):
 	plt.savefig('Scatter_r_' + str(retailerid) + '_d_' + str(days) +'_' + on + '.png')
 
 
+ng_dir = r'C:\P5GIT\\'
+
+dataframe = dl.load_sales_file(ng_dir + 'CleanedData.rpt')
+make_scatteplot(dataframe)
+
 # test af kode
 
 # # sales
