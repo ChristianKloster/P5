@@ -90,48 +90,45 @@ def total_quantity_in_period_rolling(df, period = '7D'):
 #     return todayquantity['quantityChain']
 
 # finder antal solgte varer på produkt/butik niveau over x perioder af y dage
-def quantity_period(df, number_periods = 3, length_period = 4):
-    col_list = ["date", "quantity", "retailerID", "productID"]
-    period_col = []
-    for i in range (0, number_periods):
-        period_col.append('quantityPeriod{0}'.format(i+1))
-    quantityPerioddf = pd.DataFrame(columns=period_col, index=df.index)
-    quantityPerioddf[col_list] = df[col_list]
-    retailers = quantityPerioddf["retailerID"].unique()
+# def quantity_period(df, number_periods = 3, length_period = 4):
+#     col_list = ["date", "quantity", "retailerID", "productID"]
+#     period_col = []
+#     for i in range (0, number_periods):
+#         period_col.append('quantityPeriod{0}'.format(i+1))
+#     quantityPerioddf = pd.DataFrame(columns=period_col, index=df.index)
+#     quantityPerioddf[col_list] = df[col_list]
+#     retailers = quantityPerioddf["retailerID"].unique()
 
-    for retailer in retailers:
-        retailerdf = quantityPerioddf[quantityPerioddf.retailerID == retailer]
-        products = retailerdf["productID"].unique()
+#     for retailer in retailers:
+#         retailerdf = quantityPerioddf[quantityPerioddf.retailerID == retailer]
+#         products = retailerdf["productID"].unique()
 
-        for product in products:
-            productdf = retailerdf[retailerdf.productID == product]
-            for i in range(1, number_periods+1):
-                productsumdf = productdf.rolling('{0}d'.format(length_period*i), on='date').sum()
-                if i>1:
-                    productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity']-productdf['quantityPeriod{0}'.format(i-1)]
-                else:
-                    productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity']
-                quantityPerioddf.update(productdf)
+#         for product in products:
+#             productdf = retailerdf[retailerdf.productID == product]
+#             for i in range(1, number_periods+1):
+#                 productsumdf = productdf.rolling('{0}d'.format(length_period*i), on='date').sum()
+#                 if i>1:
+#                     productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity']-productdf['quantityPeriod{0}'.format(i-1)]
+#                 else:
+#                     productdf['quantityPeriod{0}'.format(i)] = productsumdf['quantity']
+#                 quantityPerioddf.update(productdf)
 
-    return quantityPerioddf[period_col]
+#     return quantityPerioddf[period_col]
 
 def quantity_in_periods_agg(df, period = 'W-SUN', n = 3, on ='productID'):
     data = df[['date', on, 'quantity']].copy()
     dates = data['date'].unique()
 
-    p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0).resample(period).sum()
-
+    p = pd.pivot_table(data, values='quantity', index=['date'], columns=on, aggfunc=np.sum).fillna(0).resample(period).sum()
     col_names = []
     for i in range(0,n):
-        result = p.shift(i+1).reindex(dates, method='pad').fillna(0)
-        col_name = 'quantity_p' + str(i)
+        result = p.shift(i+1).fillna(0).reindex(dates, method='pad')
+        col_name = 'qty_p' + str(i+1)
         col_names.append(col_name)
         data[col_name] = tuple(map(lambda date, label: result.loc[date, label], data['date'], data[on]))
 
-    return data[col_names], col_names
-  
-
-
+    data[col_names] = data[col_names].fillna(0)
+    return data[col_names]
 
 # finder stigningen i antal solgte varer på produkt/butik niveau over x perioder af y dage
 def stigning_period(df, number_periods = 3, length_period = 4):
@@ -337,36 +334,43 @@ def month_feature(df):
 def discount_to_percent(dataframe):
     df = dataframe[['discount','turnover']]
     discount = pd.DataFrame(columns=['discountP'], index=df.index)
+
     discount['discountP'] = abs(df['discount'])/(abs(df['discount'])+abs(df['turnover']))*100
 
     return discount['discountP']
 
 #Returns a list of avg style price for each transaction
 def get_avg_price_in_style(dataframe):
-    df = dataframe[['styleNumber','turnover','discount','quantity']]
-    avgprice = pd.DataFrame(columns=['avg_style_price'], index=df.index)
+    df = dataframe[['styleNumber','turnover','discount','quantity']].copy()
 
-    avgprice['avg_style_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
+    df['avg_style_price'] = (abs(df['turnover'])+abs(df['discount'])) / abs(df['quantity'])
 
-    return avgprice['avg_style_price']
+    return df['avg_style_price']
 
 #Returns a list with average day price for each transaction.
 #Executive grazt
 def create_avg_list(dataframe):
-    df = dataframe[['date','turnover','discount','quantity']]
-    df = df.groupby('date', as_index= False).sum(numeric_only = True)
+    data = dataframe[['date','turnover','discount','quantity']].copy()
+    df = data.groupby('date').sum(numeric_only = True)
     df['avg_day_price'] = (abs(df['turnover'])+abs(df['discount']))/abs(df['quantity'])
-    avg_lst= []
-    x=0
+    df['avg_day_price'] = df['avg_day_price'].shift(1).fillna(0)
 
-    for i in dataframe.index:
-        if dataframe.date[i] == df.date[x]:
-            avg_lst.append(df.avg_day_price[x])
-        elif x<df.shape[0]-1:
-            x+=1
+    data['avg_price_yesterday'] = tuple(map(lambda date: df.loc[date, 'avg_day_price'], data['date']))
 
-    print(len(avg_lst))
-    return avg_lst
+    return data['avg_price_yesterday']
+
+
+    # avg_lst= []
+    # x=0
+
+    # for i in dataframe.index:
+    #     if dataframe.date[i] == df.date[x]:
+    #         avg_lst.append(df.avg_day_price[x])
+    #     elif x<df.shape[0]-1:
+    #         x+=1
+
+    # print(len(avg_lst))
+    # return avg_lst
 
 def featureplcBD(df):
     #Relativt store udslag i hældningen, ikke nær så præcis som CD metoden, kan produceres for dags dato
@@ -456,11 +460,10 @@ def featureplcCD(df):
 #     return lifetimes[['lifetimeChain', 'lifetimeRetailer']]
 
 # laver alder på stylenumber baseret på df
-def feature_age(df):
+def age_feature(df):
     data = df[['date', 'styleNumber']].copy()
 
     firstdates = data.groupby('styleNumber').first()
-    print(firstdates)
 
     data['first'] = tuple(map(lambda style: firstdates.loc[style,'date'], data['styleNumber']))
     data['styleage'] = (data['date'] - data['first']).dt.days
@@ -526,9 +529,6 @@ def featureacceleration(df):
     return acceleration[['accelerationChainStyle', 'accelerationRetailerStyle']]
 
 
-
-col_name = 'color_popularity'
-
 class ColorFeatureProvider:
     def __init__(self, df, window = '7d'):
         df = df.copy()
@@ -547,21 +547,17 @@ class ColorFeatureProvider:
         else:
             return self.table.loc[date, color]
 
-def make_feature_col(df, window = '7d'):
+def make_colorfeature(df, window = '7d'):
     cfp = ColorFeatureProvider(df, window)
     data = df.copy()
     data.colorname = data.colorname.str.lower().str.strip()
     data = data.dropna(axis=0, how='any')
 
-    data[col_name] = np.nan
+    # data[col_name] = np.nan
 
-    data[col_name] = tuple(map(lambda color, date: cfp.get_color_popularity(color = color, date = date), data['colorname'], data['date']))
+    data['color_popularity'] = tuple(map(lambda color, date: cfp.get_color_popularity(color = color, date = date), data['colorname'], data['date']))
 
     return data['color_popularity']
-
-def get_feature_name():
-    return col_name
-
 
 class SizeFeature:
     def __init__(self):
@@ -725,7 +721,7 @@ class SizeFeature:
             return 8888
 
 # requires that chainid and ismale is present
-def make_sizefeature_col(df):
+def make_sizefeature(df):
     sf = SizeFeature()
 
     data = df.copy()
@@ -761,25 +757,61 @@ def featurize(df, path):
 def featurize2(df):
 
     data = df.copy()
-    # global features
 
+    print('making global features...')
+    # global features
+    # data['size_scale'] = make_sizefeature(data)
+    # data['color_popularity'] = make_colorfeature(data, window = '7D')
+    # data['style_age'] = age_feature(data)
 
 
     # chain features
+    print('making chain-level features...')
     chains = df['chainID'].unique()
     for c in chains:
+        print('chain: ' + str(c))
         chain_data = data[data.chainID == c]
 
-        
-        data.loc[data.chainID == c,'total_turnover'] = total_turnover_in_period_rolling(chain_data).copy()
+        # data.loc[data.chainID == c,'total_turnover'] = total_turnover_in_period_rolling(chain_data, period = '7D').copy()
 
     # retailer features
+    print('making retailer-level features...')
     retailers = df['retailerID'].unique()
+    l = len(retailers)
+    n = 1
+    # data['qty_p1'] = 0.0
+    # data['qty_p2'] = 0.0
+    # data['qty_p3'] = 0.0
+
+
     for r in retailers:
+        print('retailer: ' + str(r)+ ' - ' + str(n) + ' of ' + str(l))
+        n += 1
+
+        # hackery
+        # if n>3:break
+
         retailer_data = data[data.retailerID == r]
 
-        # retailer_data[]
+        # data.loc[data.retailerID == r,'total_turnover_retailer'] = total_turnover_in_period_rolling(retailer_data).copy()
+        # data.loc[data.retailerID == r,'avg_price_yesterday'] = create_avg_list(retailer_data)
 
+
+        temp = quantity_in_periods_agg(retailer_data, n = 3, on = 'styleNumber')
+        data.loc[data.retailerID == r,'qty_p1'] = temp['qty_p1']
+        data.loc[data.retailerID == r,'qty_p2'] = temp['qty_p2']
+        data.loc[data.retailerID == r,'qty_p3'] = temp['qty_p3']
+
+        # retaile data opdateres her
+        retailer_data = data[data.retailerID == r]
+
+        data.loc[data.retailerID == r,'slope_p1p2'] = retailer_data['qty_p1'] - retailer_data['qty_p2']
+        data.loc[data.retailerID == r,'slope_p2p3'] = retailer_data['qty_p2'] - retailer_data['qty_p3']
+
+        retailer_data = data[data.retailerID == r]
+
+        data.loc[data.retailerID == r,'acc_p1p3'] = retailer_data['slope_p1p2'] - retailer_data['slope_p2p3']
+        
     return data
 
 
@@ -789,12 +821,17 @@ kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
 ng_dir = r'C:\P5GIT\\'
 
+print('Loading data...')
+
 dataframe = dl.load_sales_file(ng_dir + 'CleanedData.rpt')
+dataframe = dataframe.dropna(axis=0, how='any')
 
 styles = ['Z99319B', 'Y95901D']
 dataframetest = dataframe[dataframe.styleNumber.isin(styles)]
 
-testframe = featurize2(dataframe)
+mysample = dataframe.sample(50000, random_state = 1234)
+
+testframe = featurize2(mysample)
 
 # dataframetest['test_feature'] = total_turnover_in_period_rolling(dataframetest)
 
