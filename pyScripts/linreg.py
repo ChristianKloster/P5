@@ -13,52 +13,53 @@ style.use('ggplot')
 
 # load dataframe with features:
 
+# data = ....
+
+# select features
+
+def regress(data, features):
 
 
-prediction_out = 7
-split_ratio = 0.8
+	df = data[features].copy()
+
+	split_ratio = 0.8
+
+	# extracting features, scaling,
+	X = np.array(df.drop(['target'], 1))
+	X = preprocessing.scale(X)
+
+	# target
+	y = np.array(df['target'])
+
+	#  splitting data
+	split_index = math.ceil(len(X) * split_ratio)
+
+	X_train = X[:split_index]
+	X_test = X[split_index:]
+
+	y_train = y[:split_index]
+	y_test = y[split_index:]
+
+	df_test = df[split_index:]
 
 
-# target value = quantity for period of prediction_out
-df['target'] = [df[i:i+prediction_out]['quantity'].sum() for i in range(len(df))]
+	# creating regressor lin_regr
+	reg = LinearRegression(n_jobs=-1)
+	# reg = Ridge(alpha = 0.5)
+	# reg = Lasso(alpha = 0.1)
+	# reg = BayesianRidge()
 
-# cleaning for nan values & end of df
-df = df[:-prediction_out]
-df = df.dropna(how='any')
+	reg.fit(X_train, y_train)
+	accuracy = reg.score(X_test, y_test)
+	prediction_set = reg.predict(X_test)
 
-# extracting features, scaling,
-X = np.array(df.drop(['target'], 1))
-X = preprocessing.scale(X)
-
-# target
-y = np.array(df['target'])
-
-#  splitting data
-split_index = ceil(len(X) * split_ratio)
-
-X_train = X[:split_index]
-X_test = X[split_index:]
-
-y_train = y[:split_index]
-y_test = y[split_index:]
-
-df_test = df[split_index:]
-
-
-# creating regressor lin_regr
-reg = LinearRegression(n_jobs=-1)
-# reg = Ridge(alpha = 0.5)
-# reg = Lasso(alpha = 0.1)
-# reg = BayesianRidge()
-
-reg.fit(X_train, y_train)
-accuracy = reg.score(X_test, y_test)
-
-print('accuracy:')
-print(accuracy)
-print()
-print(coefficients:)
-print(reg.coef_)
+	print('accuracy:')
+	print(accuracy)
+	print()
+	print('coefficients:')
+	print(reg.coef_)
+	print()
+	print('test set size: ' + str(len(y_test)) + ' (' + str(split_ratio) + ')' )
 
 
 # prediction_set = reg.predict(X_test)

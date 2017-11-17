@@ -122,7 +122,22 @@ def quantity_in_periods_agg(df, period = 'W-SUN', n = 3, on ='productID'):
     p = pd.pivot_table(data, values='quantity', index=['date'], columns=on, aggfunc=np.sum).fillna(0).resample(period).sum()
     col_names = []
     for i in range(0,n):
-        result = p.shift(i+1).fillna(0).reindex(dates, method='pad')
+        result = p.shift(i).fillna(0).reindex(dates, method='pad')
+        col_name = 'qty_p' + str(i+1)
+        col_names.append(col_name)
+        data[col_name] = tuple(map(lambda date, label: result.loc[date, label], data['date'], data[on]))
+
+    data[col_names] = data[col_names].fillna(0)
+    return data[col_names]
+
+def quantity_in_periods_rolling(df, period = '7D', n = 3, on ='productID'):
+    data = df[['date', on, 'quantity']].copy()
+    dates = data['date'].unique()
+
+    p = pd.pivot_table(data, values='quantity', index=['date'], columns=on, aggfunc=np.sum).fillna(0).rolling(period).sum()
+    col_names = []
+    for i in range(0,n):
+        result = p.shift(i).fillna(0)
         col_name = 'qty_p' + str(i+1)
         col_names.append(col_name)
         data[col_name] = tuple(map(lambda date, label: result.loc[date, label], data['date'], data[on]))
@@ -728,6 +743,33 @@ def make_sizefeature(df):
     data['size_scale'] = tuple(map(lambda size, chainID, ismale: sf.get_size_feature(size=size, chainID = chainID, male = ismale), data['size'], data['chainID'], data['ismale']))
     return data['size_scale']
 
+
+def target_values_agg(df, days = 'W-SUN', on = 'productID'):
+    data = df.copy()
+
+    data = data[['date', on, 'quantity']]
+
+    p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0).resample(days).sum()
+    p = p.shift(-1).fillna(-9999).reindex(data['date'].unique(), method='pad')
+
+    data['target'] = tuple(map(lambda date, label: p.loc[date, label], data['date'], data[on]))
+
+    return data['target'].fillna(-9999)
+
+def target_values_rolling(df, days = 7, on = 'productID'):
+    data = df.copy()
+
+    data = data[['date', on, 'quantity']]
+
+    days_s = str(days) + 'D'
+
+    p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0).rolling(days_s).sum()
+    p = p.shift(-days).fillna(-9999)
+
+    data['target'] = tuple(map(lambda date, label: p.loc[date, label], data['date'], data[on]))
+    
+    return data['target'].fillna(-9999)
+
 def featurize(df, path):
     functionlist = {'quantityChain':today_quantity, 'turnoverChain':today_turnover}#, 'month_feat': month_feature,
                     # 'month_change_dist':month_change_dist_feature, 'month_first_dist':month_first_dist_feature,
@@ -797,7 +839,7 @@ def featurize2(df):
         # data.loc[data.retailerID == r,'avg_price_yesterday'] = create_avg_list(retailer_data)
 
 
-        temp = quantity_in_periods_agg(retailer_data, n = 3, on = 'styleNumber')
+        temp = quantity_in_periods_rolling(retailer_data, n = 3, period='7D', on = 'productID')
         data.loc[data.retailerID == r,'qty_p1'] = temp['qty_p1']
         data.loc[data.retailerID == r,'qty_p2'] = temp['qty_p2']
         data.loc[data.retailerID == r,'qty_p3'] = temp['qty_p3']
@@ -811,8 +853,13 @@ def featurize2(df):
         retailer_data = data[data.retailerID == r]
 
         data.loc[data.retailerID == r,'acc_p1p3'] = retailer_data['slope_p1p2'] - retailer_data['slope_p2p3']
+
+        data.loc[data.retailerID == r, 'target'] = target_values_agg(retailer_data, days = 'W-SUN', on = 'productID')
         
-    return data
+    print(data['target'].tail(10))
+    result = data[data.target != -9999].copy()
+
+    return result
 
 
 #Load clean data
@@ -829,7 +876,7 @@ dataframe = dataframe.dropna(axis=0, how='any')
 styles = ['Z99319B', 'Y95901D']
 dataframetest = dataframe[dataframe.styleNumber.isin(styles)]
 
-mysample = dataframe.sample(50000, random_state = 1234)
+mysample = dataframe#.sample(50000, random_state = 1234)
 
 testframe = featurize2(mysample)
 
@@ -839,7 +886,17 @@ testframe = featurize2(mysample)
 
 # dataframe[col_names] = df
 
-print(testframe)
+import linreg
+
+features = [
+    'qty_p1', 
+    'slope_p1p2' , 
+    # 'acc_p1p3' ,
+    'target']
+
+linreg.regress(testframe, features)
+
+# print(testframe)
 # print(feature_age(dataframetest))
 
 
