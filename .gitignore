@@ -10,3 +10,4 @@ CleanData/CleanedData_Old\.rpt
 \.idea/workspace\.xml
 
 pyScripts/__pycache__/dataloader\.cpython-36\.pyc
+CleanData/CleanedData_no_isnos.rpt
