@@ -1,11 +1,14 @@
-import DataLoad as dl
+import dataloader as dl
 import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
 import retailerdata as rd
 
-df = dl.loadSalesFile('C:/Users/Patrick/PycharmProjects/untitled/CleanData/CleanedData.rpt')
+dir_patrick = 'C:/Users/Patrick/PycharmProjects/untitled/CleanData/CleanedData.rpt'
+dir_SM = r'C:\Users\SMSpin\Documents\GitHub\P5\CleanData\CleanedData_no_isnos.rpt'
+
+df = dl.load_sales_file(dir_SM)
 
 columns = df.columns.tolist()
 columns = [c for c in columns if c not in ['quantity', 'date', 'SupplierItemgroupName', 'size', 'styleNumber', 'colorname', 'description']]
