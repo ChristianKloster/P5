@@ -1,0 +1,26 @@
+import DataLoad as dl
+import pandas as pd
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+import retailerdata as rd
+
+df = dl.loadSalesFile('C:/Users/Patrick/PycharmProjects/untitled/CleanData/CleanedData.rpt')
+
+columns = df.columns.tolist()
+columns = [c for c in columns if c not in ['quantity', 'date', 'SupplierItemgroupName', 'size', 'styleNumber', 'colorname', 'description']]
+
+# columns = [c for c in columns if c in ['discount', 'turnover']]
+print(df.describe())
+for c in columns:
+    y = df['quantity']
+    x = df['{0}'.format(c)]#/df['quantity']
+    plt.close()
+    plt.figure()
+    plt.plot(x, y, '.')
+    plt.ylabel('quantity')
+    plt.xlabel('{0}'.format(c))
+    plt.title('quantity vs {0}'.format(c))
+    plt.tight_layout()
+    plt.savefig('quantity_vs_{0}.png'.format(c))
+    print('{0} DONE'.format(c))

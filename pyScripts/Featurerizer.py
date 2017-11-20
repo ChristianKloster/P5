@@ -856,7 +856,7 @@ def featurize2(df):
 
         data.loc[data.retailerID == r, 'target'] = target_values_agg(retailer_data, days = 'W-SUN', on = 'productID')
         
-    print(data['target'].tail(10))
+    # print(data['target'].tail(10))
     result = data[data.target != -9999].copy()
 
     return result

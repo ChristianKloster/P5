@@ -4,6 +4,7 @@ import datetime
 import numpy as np
 from sklearn import preprocessing, svm, model_selection
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, BayesianRidge
+from sklearn.neural_network import MLPRegressor
 import matplotlib.pyplot as plt
 from matplotlib import style
 import dataloader
@@ -22,7 +23,7 @@ def regress(data, features):
 
 	df = data[features].copy()
 
-	split_ratio = 0.8
+	split_ratio = 0.9
 
 	# extracting features, scaling,
 	X = np.array(df.drop(['target'], 1))
@@ -44,7 +45,8 @@ def regress(data, features):
 
 
 	# creating regressor lin_regr
-	reg = LinearRegression(n_jobs=-1)
+	# reg = LinearRegression(n_jobs=-1)
+	reg = MLPRegressor()
 	# reg = Ridge(alpha = 0.5)
 	# reg = Lasso(alpha = 0.1)
 	# reg = BayesianRidge()
@@ -56,8 +58,8 @@ def regress(data, features):
 	print('accuracy:')
 	print(accuracy)
 	print()
-	print('coefficients:')
-	print(reg.coef_)
+	# print('coefficients:')
+	# print(reg.coef_)
 	print()
 	print('test set size: ' + str(len(y_test)) + ' (' + str(split_ratio) + ')' )
 
