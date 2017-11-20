@@ -41,6 +41,15 @@ def add_chainId(df,rdf):
 
 #add_chainId(df, rdf).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_New.rpt', index = False, sep=';',encoding='utf-8')
 
+def remove_returns(df):
+    return df[df.quantity >= 0]
+
+def remove_isnos(df):
+    return df[df.isNOS == 1]
+
+
+
+
 def add_ismale(df):
     ismale_list = []
 
@@ -59,6 +68,10 @@ def add_ismale(df):
 #add_ismale(df).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData.rpt', index = False, sep=';',encoding='utf-8')
 
 
+
+remove_returns(df).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_no_returns.rpt', index = False, sep=';',encoding='utf-8')
+remove_isnos(df).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_no_isnos.rpt', index = False, sep=';',encoding='utf-8')
+remove_returns(remove_isnos(df)).to_csv(path_or_buf=r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\CleanedData_no_returns_no_isnos.rpt', index = False, sep=';',encoding='utf-8')
 
 
 
