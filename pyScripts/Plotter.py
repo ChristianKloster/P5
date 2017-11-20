@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import matplotlib.dates
 #import meta as mt
 import numpy as np
 from datetime import timedelta
@@ -40,6 +41,14 @@ def plc(dataframe, name, retailer = 0, product = 0, ignore_returns = 1):
         ax = dataframe_weekly.plot(secondary_y=['turnover'])
         ax.set_ylabel('quantity')
         ax.right_ax.set_ylabel('turnover')
+        #Sætter max-værdier for akserne
+        #ax.set_ylim(ymax=22000, ymin=-50)
+        #ax.right_ax.set_ylim(ymax=850000, ymin=-50)
+
+        datemin = pd.datetime(2016, 6, 1)
+        datemax = pd.datetime(2017,9, 10)
+        ax.set_xlim(datemin, datemax)
+
         #Tjekker for mappen, hvis den ikke findes oprettes den
         directory = os.path.dirname(name)
         if not os.path.exists(directory):

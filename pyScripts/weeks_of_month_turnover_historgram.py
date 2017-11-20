@@ -8,6 +8,7 @@ import os
 import sys
 days_in_period = 7
 
+Monthslist = ['januar', 'februar', 'marts', 'april', 'maj,', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december']
 
 #Return the sum og the quantity/turnover in given period
 def between_days_sum(df, unit, start_date, end_date):
@@ -28,7 +29,11 @@ def histogram(inputdata, titl, xlabel, ylabel):
     x = df.plot(kind='bar', color=colors, edgecolor='black', title=titl)
     x.set_xlabel(xlabel)
     x.set_ylabel(ylabel)
-    x.legend([xlabel])
+
+    #sæt fast maxværdi vist på y_aksen
+    #x.set_ylim(ymax=450000)
+
+    x.legend_.remove()
     plt.tight_layout()
 
 #Til between_days_sum metoden
@@ -62,7 +67,7 @@ def days_in_last_period(months_included, periodstart):
 
     return days_in_last_period_result
 
-def plot_per_day(dataframe, unit, year, month_is_specific = False, description = '_all_available_months'):
+def plot_per_day(dataframe, unit, year, month_is_specific = False, description = '_all_available_months', title = 'alle måneder'):
     df = dataframe
     raw_data = []
 
@@ -78,11 +83,13 @@ def plot_per_day(dataframe, unit, year, month_is_specific = False, description =
         sys.exit("Incorrect unit")
 
     #Gets the name of month
-    month_str = df.iloc[0].date.strftime("%B")
+    #month_str = df.iloc[0].date.strftime("%B")
+    month_str = (Monthslist[df.iloc[0].date.month - 1])
+
     print(unit + ' ' + month_str + ' ' + str(year))
     print(raw_data)
-    title = month_str + ' ' + str(year) if month_is_specific else 'All months'
-    histogram(raw_data, title, 'Date', unit)
+    titl = month_str + ' ' + str(year) if month_is_specific else title
+    histogram(raw_data, titl, 'Dato', unit)
 
     if month_is_specific:
         file_name = 'PLC/month_sale/' + unit + '/' + unit + '_' + str(year) + '_' + str(
@@ -103,15 +110,16 @@ def plot_per_day_individual_months(dataframe, unit, year):
         df = dataframe[(dataframe.date.dt.month == month) & (dataframe.date.dt.year == year)]
         plot_per_day(df, unit, year, True)
 
-dataframe = dl.load_sales_file('C:/Users/SM-Baerbar/Documents/GitHub/P5/CleanData/CleanedData.rpt')
-months_included = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+dataframe = dl.load_sales_file('C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData_no_isnos.rpt')
+months_included = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 dataframe = dataframe[dataframe.date.dt.month.isin(months_included)] #Ser kun måneder som er i months
-description = 'all_available_months_but_1_and_12'
+description = 'all_available_months'
+title = "alle måneder"
 
 print('Months_included before first run: ' + str(months_included))
 
 raw_data ={
-	'days 1-8':    [(between_days_sum(dataframe, 'Quantity', 1, 8)/8)],
+	'days 1-7':    [(between_days_sum(dataframe, 'Quantity', 1, 7)/7)],
 	'days 8-15':    [(between_days_sum(dataframe, 'Quantity', 8, 15)/8)],
 	'days 16-23':     [(between_days_sum(dataframe, 'Quantity', 16, 23)/8)],
 	'days 24-31':      [(between_days_sum(dataframe, 'Quantity', 24, 31)/days_in_last_period(months_included, 24))]
@@ -119,19 +127,19 @@ raw_data ={
 
 histogramB(raw_data, 'Quantity', 'Time', description)
 raw_data ={
-	'days 1-8':    [(between_days_sum(dataframe, 'Turnover', 1, 8)/8)],
+	'days 1-7':    [(between_days_sum(dataframe, 'Turnover', 1, 7)/7)],
 	'days 8-15':    [(between_days_sum(dataframe, 'Turnover', 8, 15)/8)],
 	'days 16-23':     [(between_days_sum(dataframe, 'Turnover', 16, 23)/8)],
 	'days 24-31':      [(between_days_sum(dataframe, 'Turnover', 24, 31)/days_in_last_period(months_included, 24))]
 }
 ##Fix så der ikke divideres med 7.416 når der er 12-n måneder
 
-histogramB(raw_data, 'Turnover', 'Time', description)
+#histogramB(raw_data, 'Turnover', 'Time', description)
 
-plot_per_day(dataframe, 'Quantity', 2016, description=description)
-plot_per_day(dataframe, 'Turnover', 2016, description=description)
+plot_per_day(dataframe, 'Quantity', 2016, description=description , title=title)
+#plot_per_day(dataframe, 'Turnover', 2016, description=description)
 
 #plot_per_day_individual_months(dataframe, 'Quantity', 2016)
 #plot_per_day_individual_months(dataframe, 'Quantity', 2017)
-#plot_per_day_individual_months(dataframe, 'Turnover', 2016)
-#plot_per_day_individual_months(dataframe, 'Turnover', 2017)
+plot_per_day_individual_months(dataframe, 'Turnover', 2016)
+plot_per_day_individual_months(dataframe, 'Turnover', 2017)
