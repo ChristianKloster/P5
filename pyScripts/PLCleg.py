@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 #Generere en liste af transactions fra suppleret retailer og kigger på en defineret top % af dem, de grupperes efter generer_fra
 def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest = 20):
     #rddf = rd('C:/Users/SMSpin/Documents/GitHub/P5/Retailers_w_coords.rpt')
-    # d_danish = rddf.get_retailers_from_country('Denmark')
+    #d_danish = rddf.get_retailers_from_country('Denmark')
     #Nordjylland, Midtjylland, Sønderjylland, Fyn, Sjælland
-    #d_region = rddf.get_retailers_from_region('Sjælland')
+    #d_region = rddf.get_retailers_from_region('Sønderjylland')
 
     d = dl.load_sales_file(r'C:\Users\SMSpin\Documents\GitHub\P5\CleanData\CleanedData_no_isnos.rpt')
     d = d.dropna(axis=0, how='any')
@@ -19,23 +19,50 @@ def plotplc(retailer = 'alle', generer_fra = 'description', percent_of_interest 
     #d = d[d.date.dt.day <=7]
     #d = d[d.retailerID.isin(d_danish.id)] #Kun danske butikke
     #d = d[d.retailerID.isin(d_region.id)] #Kun butikker i bestemt region
-    #d = d[d.SupplierItemgroupName == 'MEN - JEANS']
+
+    #Medtag kun produkter som første gang optræder efter datemin
+    #d['firstappearance'] = first_appearance(d)
+    #datemin = pd.datetime(2016, 9, 10)
+    #d = d[d.firstappearance >= datemin]
+
+    #d = d[d.SupplierItemgroupName == 'WOMEN - JEANS']
     if retailer != 'alle':
         d = d[d.retailerID == retailer]
 
     #Plotter for alle produkter i én graf
-    plc(d, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, 'all'), ignore_returns = 0)
+    #plc(d, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, 'WOMEN - JEANS'), ignore_returns = 0)
     # Laver en sorteret liste sorteret efter mængde forekomster
     a = d[generer_fra].value_counts()
     # Summere og har med overPercentDesc mulighed for at give en procentvis grænse for hvor stor en del af salget
     # der skal plottes for. 0.01 plotter kun varer der udgør 1% af total salg
 
-    #a = a.head(int(round(a.size * (percent_of_interest / 100))))
-    #for x in a:
-    #    tilPLC = d[d[generer_fra] == a[a == x].index[0]]
-    #    plc(tilPLC, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, tilPLC['styleNumber'].iloc[0]))
+    a = a.head(int(round(a.size * (percent_of_interest / 100))))
+    for x in a:
+        tilPLC = d[d[generer_fra] == a[a == x].index[0]]
+        plc(tilPLC, 'PLC/{0}/{1}/{2}'.format(retailer, generer_fra, tilPLC['styleNumber'].iloc[0]))
 
     #Tager et productID eller et stylenumber og udprinter information om varen
+
+def age_feature(df):
+    data = df[['date', 'styleNumber']].copy()
+
+    firstdates = data.groupby('styleNumber').first()
+
+    data['first'] = tuple(map(lambda style: firstdates.loc[style,'date'], data['styleNumber']))
+    data['styleage'] = (data['date'] - data['first']).dt.days
+
+    return data['styleage']
+
+def first_appearance(df):
+    data = df[['date', 'styleNumber']].copy()
+
+    firstdates = data.groupby('styleNumber').first()
+
+    data['first'] = tuple(map(lambda style: firstdates.loc[style, 'date'], data['styleNumber']))
+    data['styleage'] = (data['date'] - data['first']).dt.days
+
+    return data['first']
+
 def productreturn(d, id):
     if id in d.productID:
         d = d[d.productID == id]
@@ -140,7 +167,7 @@ def featureacceleration(d, id):
     return acceleration
 
 
-plotplc('alle', percent_of_interest=100)
+plotplc('alle', percent_of_interest=12)
 # df = df[df.retailerID == 4]
 
 

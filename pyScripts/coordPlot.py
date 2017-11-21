@@ -3,12 +3,12 @@ import geoCoords as gc
 import pandas as pd
 import retailerdata as rd
 import random as rnd
-import DataLoading as dl
+import dataloader as dl
 
 
 jitter = 0.015
 
-RD = rd.retailerData('Retailers_w_coords.rpt')
+RD = rd.retailerData(r'C:\Users\SMSpin\Documents\GitHub\P5\Retailers_w_coords.rpt')
 
 def get_color_from_chain(retailerid):
 	ch = RD.get_chainnumber_from_retailerid(retailerid)
@@ -41,7 +41,7 @@ def get_color_from_region(retailerid):
 df = RD.get_dataframe()
 # df = RD.get_retailers_from_region('Midtjylland')
 #df = df[df.country == 'Denmark']
-df = df[df.chainid == 4]
+#df = df[df.chainid == 1]
 
 lats = df['lat'].get_values()
 lngs = df['lng'].get_values()
@@ -72,7 +72,7 @@ lngs = df['lng'].get_values()
 
 gmap=gm.GoogleMapPlotter(lats[0],lngs[0], 7)
 
-#gmap.heatmap(lats,lngs, radius = 25)
+gmap.heatmap(lats,lngs, radius = 25)
 
 for i in range(0,len(df)):
 	row = df.iloc[i]
@@ -80,10 +80,10 @@ for i in range(0,len(df)):
 	lat = row['lat'] + (rnd.random() - 0.5) * jitter
 	lng = row['lng'] + (rnd.random() - 0.5) * jitter
 	gmap.marker(lat, lng, c = get_color_from_region(retailerID), title = str(retailerID))
-	# gmap.circle(lat, lng, c = get_color_from_chain(retailerID), radius = 10000)
+	#gmap.circle(lat, lng, c = get_color_from_chain(retailerID), radius = 10000)
 
 
-gmap.draw('ch3_all_map.html')
+gmap.draw('heatmap_all.html')
 
 # coords = []
 # lat=[]

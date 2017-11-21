@@ -42,12 +42,12 @@ def plc(dataframe, name, retailer = 0, product = 0, ignore_returns = 1):
         ax.set_ylabel('quantity')
         ax.right_ax.set_ylabel('turnover')
         #Sætter max-værdier for akserne
-        #ax.set_ylim(ymax=22000, ymin=-50)
-        #ax.right_ax.set_ylim(ymax=850000, ymin=-50)
+        #ax.set_ylim(ymax=400, ymin=0)
+        #ax.right_ax.set_ylim(ymax=30000, ymin=0)
 
-        datemin = pd.datetime(2016, 6, 1)
+        datemin = pd.datetime(2016, 9, 1)
         datemax = pd.datetime(2017,9, 10)
-        ax.set_xlim(datemin, datemax)
+        ax.set_xlim(xmin=datemin,xmax=datemax)
 
         #Tjekker for mappen, hvis den ikke findes oprettes den
         directory = os.path.dirname(name)
