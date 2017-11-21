@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 import sklearn.metrics #import mean_squared_error, r2_score
 import targetprovider
 import FeaturerizerOld as FO
-import linreg
+import linregp
 
 
 def naivemodel(today, tomorrow):
@@ -77,7 +77,7 @@ def tester(df):
         # 'acc_p1p3' ,
         'target']
 
-    predict = linreg.regress(testframe, features)
+    predict = linregp.regress(testframe, features)
     generer_fra = 'productID'
     #Til et længere tid men mere automatiseret
     # retailers = mysample.retailerID.unique()
