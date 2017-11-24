@@ -11,3 +11,4 @@ CleanData/CleanedData_Old\.rpt
 
 pyScripts/__pycache__/dataloader\.cpython-36\.pyc
 CleanData/CleanedData_no_isnos.rpt
+CleanData/CleanedData_no_isnos_no_outliers.rpt

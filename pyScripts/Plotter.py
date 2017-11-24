@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import dataloader as dl
 import matplotlib.dates
 #import meta as mt
 import numpy as np
@@ -34,18 +35,25 @@ def plc(dataframe, name, retailer = 0, product = 0, ignore_returns = 1):
                                    axis = 1, keys = ['quantity', 'discount', 'turnover'])
         #Fungere ligesom groupby, men med en bestemt frekvens 4D = 4 dage, W = week
 
-        dataframe_weekly = dataframe_plot.resample('W').agg({'quantity' : 'sum', 'turnover' : 'sum'})
-        dataframe_weekly.plot()
+        dataframe_retailers = dataframe.groupby('date').nunique()
+        dataframe_retailers = dataframe_retailers.resample('W-SUN').sum()
+        dataframe_retailers = dataframe_retailers['retailerID']
+
+        dataframe_weekly = dataframe_plot.resample('W-SUN').agg({'quantity' : 'sum', 'turnover' : 'sum'})
+
+        dataframe_weekly = dataframe_weekly.div(dataframe_retailers, axis='index')
+        #dataframe_weekly.plot()
         #Udkommenteret mulighed for at lave 2 y akser, jeg syntes det virkede mere uoverskueligt
         plt.figure()
         ax = dataframe_weekly.plot(secondary_y=['turnover'])
         ax.set_ylabel('quantity')
         ax.right_ax.set_ylabel('turnover')
+        ax.set_xlabel('dato')
         #Sætter max-værdier for akserne
         #ax.set_ylim(ymax=400, ymin=0)
         #ax.right_ax.set_ylim(ymax=30000, ymin=0)
 
-        datemin = pd.datetime(2016, 9, 1)
+        datemin = pd.datetime(2016, 6, 1)
         datemax = pd.datetime(2017,9, 10)
         ax.set_xlim(xmin=datemin,xmax=datemax)
 
@@ -54,8 +62,34 @@ def plc(dataframe, name, retailer = 0, product = 0, ignore_returns = 1):
         if not os.path.exists(directory):
                 os.makedirs(directory)
         plt.tight_layout()
-        plt.savefig('%s.png' % name)
+        plt.show()
+        #plt.savefig('%s.png' % name)
         # mt.addMetaData('%s.png' %name, {'from':firstdate, 'to':lastdate,
         #                                  'retailer':retailer, 'product':product})
         plt.close()
 
+def retailers(dataframe, name):
+        columns = ['date']
+        df = dataframe
+        df = df.groupby(columns).nunique()
+        df = df['retailerID']
+        print(df)
+
+        plt.figure()
+        ax = df.plot(x='date', y='retailerID')
+        ax.set_ylabel('antal butikker')
+        ax.set_xlabel('dato')
+
+        datemin = pd.datetime(2016, 6, 1)
+        datemax = pd.datetime(2017, 9, 10)
+        ax.set_xlim(xmin=datemin, xmax=datemax)
+
+        #Tjekker for mappen, hvis den ikke findes oprettes den
+        directory = os.path.dirname(name)
+        if not os.path.exists(directory):
+                os.makedirs(directory)
+        plt.tight_layout()
+        plt.savefig('%s.png' % name)
+
+#d = dl.load_sales_file(r'C:\Users\SMSpin\Documents\GitHub\P5\CleanData\CleanedData_no_isnos_no_outliers.rpt')
+#retailers(d, 'PLC/retailsersovertime')
