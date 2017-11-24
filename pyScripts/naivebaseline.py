@@ -31,8 +31,12 @@ def naivemodel(today, tomorrow):
     errormargin = lifetime.apply(pd.value_counts).fillna(0)
     # print('fejl margen')
     # print(errormargin) .dropna()
-    percent = (errormargin.loc[0]/errormargin.sum(axis=0)) * 100
-    averagepercent = percent.sum()/percent.size
+    test = errormargin.index
+    if 0 in errormargin.index._data:
+        percent = (errormargin.loc[0]/errormargin.sum(axis=0)) * 100
+        percent = percent.sum()
+    else:
+        percent = 0
     errormargin = errormargin.sum(axis=1)
     # Without regard for lifetime
     # errormargin = error.apply(pd.value_counts).fillna(0)
@@ -43,13 +47,13 @@ def naivemodel(today, tomorrow):
     # print('Average procent')
     # print(averagepercent)
     # print(percent.describe())
-    return lifetime, errormargin, percent, averagepercent
+    return lifetime, errormargin, percent
 
 def test_of_model(today, predicted, splitpercent):
     # Giver fejlen i prediction i tøjmængde, negativ er for lidt forudset, positiv for meget forudset
     testtarget = today.copy()
     testtarget = testtarget.iloc[::-1]
-    testtarget = testtarget.head(int(np.floor(testtarget.shape[0] * (1-splitpercent))))
+    testtarget = testtarget.head(int(np.ceil(testtarget.shape[0] * (1-splitpercent))))
     testtarget = testtarget.iloc[::-1]
     predictedround = np.round_(predicted)
     error = predictedround - testtarget['target']
@@ -65,8 +69,8 @@ def test_of_model(today, predicted, splitpercent):
     return error, errormargin, percent
 
 def tester(df):
-    ret = 4
-    mysample = df[df.retailerID == ret]  # .sample(50000, random_state = 1234)
+    # retailers = [2, 4]
+    mysample = df#[df.retailerID == ret]  # .sample(50000, random_state = 1234)
 
     testframe = FO.featurize2(mysample)
     # df, col_names = quantity_in_periods_agg(dataframe)
@@ -80,33 +84,49 @@ def tester(df):
     predict = linregp.regress(testframe, features)
     generer_fra = 'productID'
     #Til et længere tid men mere automatiseret
-    # retailers = mysample.retailerID.unique()
-    # errormargin = 0
-    # percent = 0
-
-    # for ret in retailers:
-    # baseline
-    quantity1W = targetprovider.get_pivot_tables_with_target_values(dataframe, retailerid=ret, days='W-SUN', on=generer_fra)
-    # splitting into target and feature, ie today and tomorrow
-    traintarget = quantity1W[0]
-    trainfeature = quantity1W[1]
-
-    week = naivemodel(trainfeature, traintarget)
-    # percent += week[3]
-    # errormargin += week[1]
-
-    # percent = percent/retailers.size
+    retailers = mysample.retailerID.unique()
+    products = mysample.productID.unique()
+    errormargin = pd.Series([0, 0, 0])
+    percent = 0
+    percent = percent/retailers.size
     test = test_of_model(testframe, predict[0], predict[2])
-    print('Procent rigtig')
-    print('Naiv: {0} Model: {1} Forbedring: {2}'.format(week[3], test[2], test[2] - week[3]))
+    for ret in retailers:
+        # baseline
+        quantity1W = targetprovider.get_pivot_tables_with_target_values(dataframe, retailerid=ret, days='W-SUN', on=generer_fra)
+        # splitting into target and feature, ie today and tomorrow
+        traintarget = quantity1W[0]
+        trainfeature = quantity1W[1]
+        week = naivemodel(trainfeature, traintarget)
+        percent = percent + week[2]
+
+        errormargin = errormargin.add(week[1], fill_value=0)
+    percent = percent / products.size
+    errormarginmodel = test[1]
+    errormarginmodel = errormarginmodel.sort_index()
+    print('Naiv: {0} Model: {1} Forbedring: {2}'.format(percent, test[2], test[2] - percent))
     print('Naiv fejlmargener')
-    print(week[1])
-    #længere tid men mere auto
-    # print('Naiv: {0} Model: {1} Forbedring: {2}'.format(percent, test[2], test[2] - percent))
-    # print('Naiv fejlmargener')
-    # print(errormargin)
+    print(errormargin)
     print('Model fejlmargener')
-    print(test[1])
+    print(errormarginmodel)
+
+    errormargin = errormargin / products.size
+    plt.figure()
+    errormargin.plot()
+    plt.ylabel('Hyppighed')
+    plt.xlabel('Fejl')
+    plt.title('Naiv fejl margin, procent {0}'.format(percent))
+    plt.tight_layout()
+    plt.savefig('naiv_error_margin_norm')
+
+    plt.close()
+    errormarginmodel = errormarginmodel / products.size
+    plt.figure()
+    errormarginmodel.plot()
+    plt.ylabel('Hyppighed')
+    plt.xlabel('Fejl')
+    plt.title('Model error margin, procent {0}'.format(test[2]))
+    plt.tight_layout()
+    plt.savefig('Model_error_margin_norm')
 
 kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
