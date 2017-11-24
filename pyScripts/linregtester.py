@@ -3,7 +3,7 @@ import pandas as pd
 
 from scipy.stats import pearsonr
 
-data = pd.read_csv('featurized_ch1_new.csv', sep = ';', encoding = 'utf-8')
+data = pd.read_csv('C:/P5GIT/featurized_ch1_new.csv', sep = ';', encoding = 'utf-8')
 
 target = 'target_prod_rolling_7'
 

@@ -564,6 +564,8 @@ def featurize2(df):
     data['discount_pct'] = discount_to_percent(data)
     data['price'] = get_price(data)
 
+    # ret df til data
+
     df['jan'] = tuple(map(lambda date: date.month == 1, df['date'])) 
     df['feb'] = tuple(map(lambda date: date.month == 2, df['date'])) 
     df['mar'] = tuple(map(lambda date: date.month == 3, df['date'])) 
@@ -609,55 +611,45 @@ def featurize2(df):
     l = len(retailers)
     n = 1
 
+    periods = [7,3,1]
+
     for r in retailers:
         print('retailer: ' + str(r)+ ' - ' + str(n) + ' of ' + str(l))
         n += 1
 
         retailer_data = data[data.retailerID == r]
 
-        # data.loc[data.retailerID == r,'color_popularity_ret'] = make_colorfeature(retailer_data, window = '7D')
+
         data.loc[data.retailerID == r,'style_age_ret'] = age_feature(retailer_data)
         data.loc[data.retailerID == r,'total_turnover_ret_rolling_7'] = total_turnover_in_period_rolling(retailer_data, period = '7D')
-        # data.loc[data.retailerID == r,'total_turnover_ret_agg_sun'] = total_turnover_in_period_agg(retailer_data, period = 'W-SUN')
         data.loc[data.retailerID == r,'total_quantity_ret_rolling_7'] = total_quantity_in_period_rolling(retailer_data, period = '7D')
-        # data.loc[data.retailerID == r,'total_quantity_ret_agg_sun'] = total_quantity_in_period_agg(retailer_data, period = 'W-SUN')
+
 
         data.loc[data.retailerID == r,'avg_price_ret'] = create_avg_list(retailer_data)
 
-        qty_rolling = quantity_in_periods_rolling(retailer_data, days = 7, n = 3, on ='productID')
-        data.loc[data.retailerID == r,'qty_p1_ret_prod_rolling_7'] = qty_rolling['qty_p1']
-        data.loc[data.retailerID == r,'qty_p2_ret_prod_rolling_7'] = qty_rolling['qty_p2']
-        data.loc[data.retailerID == r,'qty_p3_ret_prod_rolling_7'] = qty_rolling['qty_p3']
+        for per in periods:
+            qty_rolling = quantity_in_periods_rolling(retailer_data, days = per, n = 3, on ='productID')
+            data.loc[data.retailerID == r,'qty_p1_ret_prod_rolling_%s' % per] = qty_rolling['qty_p1']
+            data.loc[data.retailerID == r,'qty_p2_ret_prod_rolling_%s' % per] = qty_rolling['qty_p2']
+            data.loc[data.retailerID == r,'qty_p3_ret_prod_rolling_%s' % per] = qty_rolling['qty_p3']
 
-        # qty_agg = quantity_in_periods_agg(retailer_data, period = 'W-SUN', n = 3, on ='productID')
-        # data.loc[data.retailerID == r,'qty_p1_ret_prod_agg_sun'] = qty_agg['qty_p1']
-        # data.loc[data.retailerID == r,'qty_p2_ret_prod_agg_sun'] = qty_agg['qty_p2']
-        # data.loc[data.retailerID == r,'qty_p3_ret_prod_agg_sun'] = qty_agg['qty_p3']
+            qty_rolling = quantity_in_periods_rolling(retailer_data, days = per, n = 3, on ='styleNumber')
+            data.loc[data.retailerID == r,'qty_p1_ret_style_rolling_%s' % per] = qty_rolling['qty_p1']
+            data.loc[data.retailerID == r,'qty_p2_ret_style_rolling_%s' % per] = qty_rolling['qty_p2']
+            data.loc[data.retailerID == r,'qty_p3_ret_style_rolling_%s' % per] = qty_rolling['qty_p3']
 
-        # retaile data opdateres her
-        # retailer_data = data[data.retailerID == r]
+            data.loc[data.retailerID == r, 'target_prod_rolling_%s' % per] = target_values_rolling(retailer_data, days = per, on = 'productID')
+            data.loc[data.retailerID == r, 'target_style_rolling_%s' % per] = target_values_rolling(retailer_data, days = per, on = 'styleNumber')
 
-        # data.loc[data.retailerID == r,'slope_p1p2'] = retailer_data['qty_p1'] - retailer_data['qty_p2']
-        # data.loc[data.retailerID == r,'slope_p2p3'] = retailer_data['qty_p2'] - retailer_data['qty_p3']
-
-        # retailer_data = data[data.retailerID == r]
-
-        # data.loc[data.retailerID == r,'acc_p1p3'] = retailer_data['slope_p1p2'] - retailer_data['slope_p2p3']
-
-        # data.loc[data.retailerID == r, 'target_prod_agg_sun'] = target_values_agg(retailer_data, days = 'W-SUN', on = 'productID')
-        data.loc[data.retailerID == r, 'target_prod_rolling_7'] = target_values_rolling(retailer_data, days = 7, on = 'productID')
-
-        
-    # print(data['target'].tail(10))
+    for per in periods:
+        data[data['target_style_rolling_%s' % per] != -9999]
 
 
-    # print(str(len(data)))
-    # result = result[result.target_prod_rolling_7 != -9999]
-    # print(str(len(result)))
+    for per in periods:
+        data['qty_speed_ret_prod_p1p2_rolling_%s' % per] = data['qty_p1_ret_prod_rolling_%s' % per] -  data['qty_p2_ret_prod_rolling_%s' % per]
+        data['qty_speed_ret_prod_p2p3_rolling_%s' % per] = data['qty_p2_ret_prod_rolling_%s' % per] -  data['qty_p3_ret_prod_rolling_%s' % per]
+        data['qty_acc_ret_prod_p1p3_rolling_%s' % per] = data['qty_speed_ret_prod_p1p2_rolling_%s' % per] -  data['qty_speed_ret_prod_p2p3_rolling_%s' % per]
 
-    data['qty_speed_ret_prod_p1p2'] = data['qty_p1_ret_prod_rolling_7'] -  data['qty_p2_ret_prod_rolling_7']
-    data['qty_speed_ret_prod_p2p3'] = data['qty_p2_ret_prod_rolling_7'] -  data['qty_p3_ret_prod_rolling_7']
-    data['qty_acc_ret_prod_p1p3'] = data['qty_speed_ret_prod_p1p2'] -  data['qty_speed_ret_prod_p2p3']
 
 
     return data
@@ -682,7 +674,7 @@ mysample = dataframe[dataframe.retailerID.isin(rets)]
 
 testframe = featurize2(dataframe[dataframe.chainID == 1])
 
-testframe.to_csv('featurized_ch1_new.csv', na_rep = 'bananaphone', index = False, sep=';',encoding='utf-8')
+testframe.to_csv('featurized_ch1_period_testing.csv', na_rep = 'bananaphone', index = False, sep=';',encoding='utf-8')
 
 # import linreg
 
