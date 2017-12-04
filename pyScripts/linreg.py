@@ -58,11 +58,9 @@ def regress(data, features, target):
 	y_train = y[:split_index]
 	y_test = y[split_index:]
 
-	df_test = df[split_index:]
-
 
 	# creating regressor lin_regr
-	# reg = LinearRegression(n_jobs=-1)
+	reg = LinearRegression(n_jobs=-1)
 	# reg = MLPRegressor(hidden_layer_sizes=(80,80), activation='logistic', alpha=0.0001,
 	# 				   learning_rate='constant', learning_rate_init=0.001,
 	# 				   power_t=0.5, max_iter=1000, shuffle=False, tol=0.0001)
@@ -73,7 +71,7 @@ def regress(data, features, target):
 	# reg = nb.BernoulliNB()
 	# reg = nb.GaussianNB()
 
-	reg = tree.DecisionTreeRegressor()
+	# reg = tree.DecisionTreeRegressor()
 	# reg = tree.ExtraTreeRegressor()
 
 
@@ -93,10 +91,57 @@ def regress(data, features, target):
 	print('max error: ' + str(maxerror))
 	print()
 
-	return ('placeholder',#(pd.DataFrame({'feature': features[0], 'target': features[1], 'coef':reg.coef_[0], 'intercept': reg.intercept_, 'r2': accuracy, 'mse' : mserror, 'pearson': pearson[0] , 'max_error' : maxerror}, index = [0]),
+	return ('placeholder', #pd.DataFrame({'feature': features[0], 'target': features[1], 'coef':reg.coef_[0], 'intercept': reg.intercept_, 'r2': accuracy, 'mse' : mserror, 'pearson': pearson[0] , 'max_error' : maxerror}, index = [0]),
 			prediction_set, y_test)
-	
 
+def regress_use_case(train, test, features, target):
+		print(target)
+		# features.append(target)
+		print('Features:')
+		print(features)
+		df = train[features].copy()
+		df2 = test[features].copy()
+
+
+		X_train = np.array(df.drop(target, 1))
+		X_test = np.array(df2.drop(target, 1))
+
+		y_train = np.array(df[target])
+		y_test = np.array(df2[target])
+
+
+		# creating regressor lin_regr
+		# reg = LinearRegression(n_jobs=-1)
+		reg = MLPRegressor(hidden_layer_sizes=(80, 80), activation='logistic', alpha=0.0001,
+						   learning_rate='constant', learning_rate_init=0.001,
+						   power_t=0.5, max_iter=1000, shuffle=False, tol=0.0001)
+		# reg = Ridge(alpha = 0.5)
+		# reg = Lasso(alpha = 0.1)
+		# reg = BayesianRidge()
+
+		# reg = nb.GaussianNB()
+
+		# reg = tree.DecisionTreeRegressor()
+		# reg = tree.ExtraTreeRegressor()
+
+
+		reg.fit(X_train, y_train)
+		# accuracy = reg.score(X_test, y_test)
+		prediction_set = reg.predict(X_test)
+
+		# print('Model: Y = ' + pretty_print_linear(reg.coef_, features) + ' + ' + str(reg.intercept_) )
+		# print('accuracy (R^2) :' + str(accuracy))
+		# mserror = mse(y_test, prediction_set)
+		# print('MSE: ' + str(mserror))
+		# print('coefficients: ' + str(reg.coef_))
+		# pearson = pn(y_test, prediction_set)
+		# print('Pearson: ' + str(pearson))
+		# maxerror = max(abs(y_test - prediction_set))
+		# print('max error: ' + str(maxerror))
+		# print()
+
+		return ('placeholder',# pd.DataFrame({'feature': features[0], 'target': features[1], 'coef':reg.coef_[0], 'intercept': reg.intercept_, 'r2': accuracy, 'mse' : mserror, 'pearson': pearson[0] , 'max_error' : maxerror}, index = [0]),
+				prediction_set, y_test)
 
 
 
