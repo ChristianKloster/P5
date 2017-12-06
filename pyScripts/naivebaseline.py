@@ -12,6 +12,32 @@ import math
 import linreg
 from sklearn.metrics import mean_squared_error as mse
 
+def naive_model_smart(df, days = 7, on = 'productID'):
+    data = df.copy()
+
+    data = data[['date', on, 'quantity']]
+
+    days_s = str(days) + 'D'
+
+    p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0)
+    dates = p.index
+    realdates = pd.date_range(dates[0], dates[len(dates) - 1])
+    p = p.reindex(realdates)
+    p = p.rolling(days_s).sum()
+    target = p.shift(-days)
+    target = target.fillna(0)
+
+    data['Previous'] = tuple(map(lambda date, label: p.loc[date, label], data['date'], data[on]))
+    data['Next'] = tuple(map(lambda date, label: target.loc[date, label], data['date'], data[on]))
+
+    errorDF = pd.DataFrame(columns=[['SSE', 'RMS', 'MSE', 'MaxError']], index=[0])
+
+    errorDF['SSE'] = sum_square_error(data['Previous'], data['Next'])
+    errorDF['RMS'] = root_mean_squares(data['Previous'], data['Next'])
+    errorDF['MSE'] = mse(data['Previous'], data['Next'])
+    errorDF['MaxError'] = max(abs(data['Previous'] - data['Next']))
+
+    return errorDF
 
 
 def naivemodel(today, tomorrow):
@@ -181,68 +207,82 @@ def tester(df, featuredf, number):
 kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
 ng_dir = r'C:\P5GIT\\'
+print('Loading data...')
+# dataframe = dl.load_sales_file(patrick_dir + 'CleanedData.rpt')
 
-dataframe = dl.load_sales_file(patrick_dir + 'CleanedData.rpt')
+dataframe = dl.load_sales_file(patrick_dir + 'CleanedData_no_isnos_no_outliers.rpt')
 
-# featureframe = featureframe.set_index('date')
-#1 month splits, model for this and prev.
-# for group_name, df_group in dataframe.groupby(pd.TimeGrouper(freq="M")):
-#     print(n)
-#     if n == 1:
-#         df = df_group.copy()
-#         df = df.reset_index()
-#     else:
-#         df = df.append(df_group.copy().reset_index(), ignore_index=False)
-#     featureframe = FO.featurize2(df)
-#     tester(df, featureframe, n)
-#     df = df_group.copy()
-#     df = df.reset_index()
-#     n = n + 1
-#2 month flat
-# for group_name, df_group in dataframe.groupby(pd.TimeGrouper(freq="2M")):
-#     print(n)
-#     df = df_group.copy()
-#     df = df.reset_index()
-#     featureframe = FO.featurize2(df)
-#     tester(df, featureframe, n)
-#     n = n + 1
 features = [
-        # 'size_scale',
-        'discount_pct',
-        'price',
-        'style_age_chain',
-        # 'total_turnover_chain_rolling',
-        'total_quantity_chain_rolling',
-        'qty_p1_chain_prod_rolling_7',
-        # 'qty_p2_chain_prod_rolling_7',
-        # 'qty_p3_chain_prod_rolling_7',
-        # 'avg_price_chain',
-        'style_age_ret',
-        # 'total_turnover_ret_rolling_7',
-        'total_quantity_ret_rolling_7',
-        # 'avg_price_ret',
-        'qty_p1_ret_prod_rolling_7',
-        'qty_p2_ret_prod_rolling_7',
-        'qty_p3_ret_prod_rolling_7',
-        'qty_speed_ret_prod_p1p2',
-        'qty_speed_ret_prod_p2p3',
-        # 'qty_acc_ret_prod_p1p3'
-        'target_prod_rolling_7'
+    # 'size_scale',
+    # 'discount_pct',
+    # 'price',
+    # 'style_age_chain',
+    # 'total_turnover_chain_rolling',
+    # 'total_quantity_chain_rolling',
+    # 'qty_p1_chain_prod_rolling_7',
+    # 'qty_p2_chain_prod_rolling_7',
+    # 'qty_p3_chain_prod_rolling_7',
+    # # 'avg_price_chain',
+    # 'style_age_ret',
+    # 'total_turnover_ret_rolling_7',
+    # 'total_quantity_ret_rolling_7',
+    # 'avg_price_ret',
+    'qty_p1_ret_prod_rolling_7',
+    'qty_p2_ret_prod_rolling_7',
+    'qty_p3_ret_prod_rolling_7',
+    'qty_speed_ret_prod_p1p2_rolling_7',
+    'qty_speed_ret_prod_p2p3_rolling_7',
+    'qty_acc_ret_prod_p1p3_rolling_7',
+    'qty_p1_ret_prod_rolling_3',
+    'qty_p2_ret_prod_rolling_3',
+    'qty_p3_ret_prod_rolling_3',
+    'qty_speed_ret_prod_p1p2_rolling_3',
+    'qty_speed_ret_prod_p2p3_rolling_3',
+    'qty_acc_ret_prod_p1p3_rolling_3',
+    'qty_p1_ret_prod_rolling_1',
+    'qty_p2_ret_prod_rolling_1',
+    'qty_p3_ret_prod_rolling_1',
+    'qty_speed_ret_prod_p1p2_rolling_1',
+    'qty_speed_ret_prod_p2p3_rolling_1',
+    'qty_acc_ret_prod_p1p3_rolling_1',
+
+    'qty_p1_ret_style_rolling_7',
+    'qty_p2_ret_style_rolling_7',
+    'qty_p3_ret_style_rolling_7',
+    # 'qty_speed_ret_style_p1p2_rolling_7',
+    # 'qty_speed_ret_style_p2p3_rolling_7',
+    # 'qty_acc_ret_style_p1p3_rolling_7',
+    'qty_p1_ret_style_rolling_3',
+    'qty_p2_ret_style_rolling_3',
+    'qty_p3_ret_style_rolling_3',
+    #'qty_speed_ret_style_p1p2_rolling_3',
+    #'qty_speed_ret_style_p2p3_rolling_3',
+    #'qty_acc_ret_style_p1p3_rolling_3',
+    'qty_p1_ret_style_rolling_1',
+    'qty_p2_ret_style_rolling_1',
+    'qty_p3_ret_style_rolling_1',
+    # 'qty_speed_ret_style_p1p2_rolling_1',
+    # 'qty_speed_ret_style_p2p3_rolling_1',
+    # 'qty_acc_ret_style_p1p3_rolling_1'
+    # 'target_prod_agg_sun'
+    'target_prod_rolling_7'
     ]
 #Fast approach
 
 n = 1
-
+dppp = 0
+dpp = 0
+dp = 0
 dataframe = dataframe[dataframe.chainID == 1]
-chains = dataframe.retailerID.unique()
+chains = dataframe.chainID.unique()
 for chain in chains:
-    # chainframe = dataframe[dataframe.chainID == chain]
-    chainframe = dataframe[dataframe.retailerID == chain]
+    chainframe = dataframe[dataframe.chainID == chain]
     chainframe = FO.featurize2(chainframe)
 
     chainframe = chainframe.set_index('date')
 
-    directory = os.path.dirname(r'C:\Users\Patrick\PycharmProjects\untitled\FastNNRetailer{0}\\'.format(chain))
+
+    directory = os.path.dirname(r'C:\Users\Patrick\PycharmProjects\untitled\RollingLin{0}\\'.format(chain))
     if not os.path.exists(directory):
          os.makedirs(directory)
 
@@ -275,49 +315,74 @@ for chain in chains:
             errorDF.iloc[n-1]['RMS'] = root_mean_squares(predict[2], predicted)
             errorDF.iloc[n - 1]['MSE'] = mse(predict[2], predicted)
             errorDF.iloc[n - 1]['MaxError'] = max(abs(predict[2] - predicted))
-
         n = n + 1
         print(errorDF)
-    errorDF = errorDF.fillna(value=0)
-    errorDF.to_csv(path_or_buf=directory + 'ErrorFrame{0}.rpt'.format(chain), index=False, sep=';', encoding='utf-8')
+    errorDF.to_csv(path_or_buf=directory + 'ErrorFrame.rpt', index=False, sep=';', encoding='utf-8')
+    chainframe = chainframe.reset_index()
+    naive = naive_model_smart(chainframe)
+    naive.to_csv(path_or_buf=directory + 'Naive.rpt', index=False, sep=';', encoding='utf-8')
 
-#Slow approach from here
-# directory = os.path.dirname(r'C:\Users\Patrick\PycharmProjects\untitled\NNChain1slow\\')
-# if not os.path.exists(directory):
+
+    #Slow approach from here
+# for chain in chains:
+#     chainframe = dataframe[dataframe.chainID == chain]
+#
+#     chainframe = chainframe.set_index('date')
+#     errorDF = pd.DataFrame(columns=[['SSE', 'RMS', 'MSE', 'MaxError']], index=range(0,69))
+#     directory = os.path.dirname(r'C:\Users\Patrick\PycharmProjects\untitled\NBChain{0}NFReplaceW1\\'.format(chain))
+#     if not os.path.exists(directory):
 #         os.makedirs(directory)
-#
-#
-# dataframe = dataframe[dataframe.chainID == 1]
-# dataframe = dataframe.set_index('date')
-# errorDF = pd.DataFrame(columns=[['SSE', 'RMS']], index=range(0, 67))
-#
-# for group_name, df_group in dataframe.groupby(pd.TimeGrouper(freq="W")):
-#     if n == 1:
-#        df = df_group.copy()
-#        df = df.reset_index()
-#     else:
-#         featureframe = FO.featurize2(df)
-#         newframe = FO.featurize2(df_group.copy().reset_index())
-#
-#         predict = linreg.regress_use_case(featureframe, newframe, features, target='target_prod_rolling_7')
-#         df = df.append(df_group.copy().reset_index(), ignore_index=True)
-#         test = test_of_model(predict[2], predict[1])
-#         errormarginmodel = test[1]
-#         errormarginmodel = errormarginmodel.sort_index()
-#         predicted = predict[1]
-#         predicted = np.round_(predicted)
-#         plt.close()
-#         errormarginmodel = errormarginmodel / errormarginmodel.sum()
-#         plt.figure()
-#         errormarginmodel.plot()
-#         plt.ylabel('Hyppighed')
-#         plt.xlabel('Fejl')
-#         plt.title('Model error margin, procent {0}'.format(test[2]))
-#         plt.tight_layout()
-#         plt.savefig('{0}/Model_error_margin_norm_{1}'.format(directory, n))
-#         errorDF.iloc[n - 1]['SSE'] = sum_square_error(predict[2], predicted)
-#         errorDF.iloc[n - 1]['RMS'] = root_mean_squares(predict[2], predicted)
-#     n = n + 1
+#     for group_name, df_group in chainframe.groupby(pd.TimeGrouper(freq="W")):
+#         if n == 1:
+#             df = df_group.copy()
+#             df = df.reset_index()
+#             featureframe = FO.featurize2(df)
+#         else:
+#             df = df.append(df_group.copy().reset_index(), ignore_index=True)
+#             if dppp != 0:
+#                 mask = (df['date'] > dppp)
+#                 newfeature = df.loc[mask]
+#                 if not(newfeature.empty):
+#                     newframe = FO.featurize2(newfeature)  # df_group.copy().reset_index())
+#                     featureframe = featureframe.append(newframe)
+#                     newframe.index = newframe.index+df._stat_axis.size
+#             elif dpp != 0:
+#                 mask = (df['date'] > dpp)
+#                 newfeature = df.loc[mask]
+#                 if not(newfeature.empty):
+#                     newframe = FO.featurize2(newfeature)#df_group.copy().reset_index())
+#                     featureframe = featureframe.append(newframe)
+#                     newframe.index = newframe.index+df._stat_axis.size
+#             elif dp != 0:
+#                 newfeature = df_group.copy().reset_index()
+#                 if not(newfeature.empty):
+#                     newframe = FO.featurize2(newfeature)  # df_group.copy().reset_index())
+#                     featureframe = featureframe.append(newframe)
+#                     newframe.index = newframe.index + df._stat_axis.size
+#             if not(featureframe.empty):
+#                 predict = linreg.regress_use_case(featureframe, newframe, features, target='target_prod_rolling_7')
+#             test = test_of_model(predict[2], predict[1])
+#             errormarginmodel = test[1]
+#             errormarginmodel = errormarginmodel.sort_index()
+#             predicted = predict[1]
+#             predicted = np.round_(predicted)
+#             plt.close()
+#             errormarginmodel = errormarginmodel / errormarginmodel.sum()
+#             plt.figure()
+#             errormarginmodel.plot()
+#             plt.ylabel('Hyppighed')
+#             plt.xlabel('Fejl')
+#             plt.title('Model error margin, procent {0}'.format(test[2]))
+#             plt.tight_layout()
+#             plt.savefig('{0}/Model_error_margin_norm_{1}'.format(directory, n))
+#             errorDF.iloc[n - 1]['SSE'] = sum_square_error(predict[2], predicted)
+#             errorDF.iloc[n - 1]['RMS'] = root_mean_squares(predict[2], predicted)
+#             errorDF.iloc[n - 1]['MSE'] = mse(predict[2], predicted)
+#             errorDF.iloc[n - 1]['MaxError'] = max(abs(predict[2] - predicted))
+#         n = n + 1
+#         dppp = dpp
+#         dpp = dp
+#         dp = group_name
 #     print(errorDF)
-# errorDF = errorDF.fillna(value=0)
-# errorDF.to_csv(path_or_buf=directory + 'ErrorFrame1.rpt', index=False, sep=';', encoding='utf-8')
+#     errorDF = errorDF.fillna(value=0)
+#     errorDF.to_csv(path_or_buf=directory + 'ErrorFrame1.rpt', index=False, sep=';', encoding='utf-8')
