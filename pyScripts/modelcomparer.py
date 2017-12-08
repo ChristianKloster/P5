@@ -86,7 +86,46 @@ def compare_models(M1, M2):
     print('Results of Old.describe - New.describe, negative tal er større fejl')
     print(Compdesc)
 
+def error_plotter(df):
+    data = df.copy()
 
+    SSEframe = data['SSE']
+    RMSframe = data['RMS']
+    MSEframe = data['MSE']
+    MaxEframe = data['MaxError']
+
+    plt.close()
+    plt.figure()
+    SSEframe.plot()
+    plt.xlabel('Iteration')
+    plt.ylabel('Fejl')
+    plt.title('SSE')
+    plt.show()
+
+    plt.close()
+    plt.figure()
+    RMSframe.plot()
+    plt.xlabel('Iteration')
+    plt.ylabel('Fejl')
+    plt.title('RMS')
+    plt.show()
+
+    plt.close()
+    plt.figure()
+    MSEframe.plot()
+    plt.xlabel('Iteration')
+    plt.ylabel('Fejl')
+    plt.title('MSE')
+    plt.show()
+
+
+    plt.close()
+    plt.figure()
+    MaxEframe.plot()
+    plt.xlabel('Iteration')
+    plt.ylabel('Fejl')
+    plt.title('Max Error')
+    plt.show()
 
 kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
 patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\\'
@@ -129,3 +168,9 @@ compare_models(MNB, MNN)
 print()
 print('Tree vs NN')
 compare_models(MTree, MNN)
+
+
+error_plotter(MNB)
+error_plotter(MTree)
+error_plotter(MLinLasso)
+error_plotter(MNN)
