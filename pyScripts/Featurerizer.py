@@ -479,7 +479,7 @@ class SizeFeature:
                             '*** ONE SIZE ***' : 0,
                             'ONE SIZE' : 0,
                             'ONE' : 0,
-                            'Unknown' : 9999}
+                            'Unknown' : -9999}
 
         self.mapping_ch3  = {'XS' : 1,
                             'XS/S': 2,
@@ -489,7 +489,7 @@ class SizeFeature:
                             'M/L' :6,  
                             'L' :7,
                             'ONE SIZE' : 0,
-                            'Unknown' : 9999}
+                            'Unknown' : -9999}
 
     # zizzi
     # Vores styles er altid udviklet efter europæiske måle standarder.
@@ -527,12 +527,12 @@ def target_values_agg(df, days = 'W-SUN', on = 'productID'):
     p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0)
     p = p.resample(days).sum()
     p = p.shift(-1)
-    p = p.fillna(-9999)
+    p = p.fillna(0)
     p = p.reindex(data['date'].unique(), method='pad')
 
     data['target'] = tuple(map(lambda date, label: p.loc[date, label], data['date'], data[on]))
 
-    result = data['target'].fillna(-9999)
+    result = data['target'].fillna(0)
     # print(result.value_counts())
     return result
 
@@ -549,10 +549,10 @@ def target_values_rolling(df, days = 7, on = 'productID'):
     p = p.reindex(realdates)
     p = p.rolling(days_s).sum()
     p = p.shift(-days)
-    p = p.fillna(-9999)
+    p = p.fillna(0)
 
     data['target'] = tuple(map(lambda date, label: p.loc[date, label], data['date'], data[on]))
-    result = data['target'].fillna(-9999)
+    result = data['target'].fillna(0)
     # print(result.value_counts())
     return result
 
@@ -560,7 +560,7 @@ def featurize2(df):
     data = df.copy()
 
     print('making global features...')
-    data['size_scale'] = make_sizefeature(data)
+    # data['size_scale'] = make_sizefeature(data)
     data['discount_pct'] = discount_to_percent(data)
     data['price'] = get_price(data)
 
@@ -578,6 +578,18 @@ def featurize2(df):
     data['oct'] = tuple(map(lambda date: 1 if date.month == 10 else 0, data['date'])) 
     data['nov'] = tuple(map(lambda date: 1 if date.month == 11 else 0, data['date'])) 
     data['dec'] = tuple(map(lambda date: 1 if date.month == 12 else 0, data['date'])) 
+    df['jan'] = tuple(map(lambda date: date.month == 1, df['date']))
+    df['feb'] = tuple(map(lambda date: date.month == 2, df['date']))
+    df['mar'] = tuple(map(lambda date: date.month == 3, df['date']))
+    df['apr'] = tuple(map(lambda date: date.month == 4, df['date']))
+    df['may'] = tuple(map(lambda date: date.month == 5, df['date']))
+    df['jun'] = tuple(map(lambda date: date.month == 6, df['date']))
+    df['jul'] = tuple(map(lambda date: date.month == 7, df['date']))
+    df['aug'] = tuple(map(lambda date: date.month == 8, df['date']))
+    df['sep'] = tuple(map(lambda date: date.month == 9, df['date']))
+    df['oct'] = tuple(map(lambda date: date.month == 10, df['date']))
+    df['nov'] = tuple(map(lambda date: date.month == 11, df['date']))
+    df['dec'] = tuple(map(lambda date: date.month == 12, df['date']))
 
     periods = [7,3,1]
 
@@ -597,6 +609,17 @@ def featurize2(df):
             data.loc[data.chainID == c,'qty_p1_chain_prod_rolling_%s' % per] = qty_rolling['qty_p1']
             data.loc[data.chainID == c,'qty_p2_chain_prod_rolling_%s' % per] = qty_rolling['qty_p2']
             data.loc[data.chainID == c,'qty_p3_chain_prod_rolling_%s' % per] = qty_rolling['qty_p3']
+        # data.loc[data.chainID == c,'total_quantity_chain_agg'] = total_quantity_in_period_agg(chain_data, period = 'W-SUN')
+
+        # qty_agg = quantity_in_periods_agg(chain_data, period = 'W-SUN', n = 3, on ='productID')
+        # data.loc[data.chainID == c,'qty_p1_chain_prod_agg_sun'] = qty_agg['qty_p1']
+        # data.loc[data.chainID == c,'qty_p2_chain_prod_agg_sun'] = qty_agg['qty_p2']
+        # data.loc[data.chainID == c,'qty_p3_chain_prod_agg_sun'] = qty_agg['qty_p3']
+
+        qty_rolling = quantity_in_periods_rolling(chain_data, days = 7, n = 3, on ='productID')
+        data.loc[data.chainID == c,'qty_p1_chain_prod_rolling_7'] = qty_rolling['qty_p1']
+        data.loc[data.chainID == c,'qty_p2_chain_prod_rolling_7'] = qty_rolling['qty_p2']
+        data.loc[data.chainID == c,'qty_p3_chain_prod_rolling_7'] = qty_rolling['qty_p3']
 
 
             qty_rolling = quantity_in_periods_rolling(chain_data, days = per, n = 3, on ='styleNumber')
@@ -650,8 +673,12 @@ def featurize2(df):
             data.loc[data.retailerID == r, 'target_ret_style_rolling_%s' % per] = target_values_rolling(retailer_data, days = per, on = 'styleNumber')
 
     for per in periods:
-        data[data['target_ret_style_rolling_%s' % per] != -9999]
-        data[data['target_ret_prod_rolling_%s' % per] != -9999]
+        # mask = data['target_style_rolling_%s' % per] == -9999
+        # data[mask] = 0
+        datas = data[data['target_prod_rolling_%s' % per] == -9999]
+        nandates = datas.date.unique()
+        print('Nan-Dates')
+        print(nandates)
 
 
 
@@ -790,27 +817,24 @@ def featurize_chain(df):
 
 #Load clean data
 #sm_dir = 'C:/Users/SMSpin/Documents/GitHub/P5/CleanData/CleanedData.rpt'
-kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
-patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
-ng_dir = r'C:\P5GIT\\'
-
-print('Loading data...')
-
-dataframe = dl.load_sales_file(ng_dir + 'CleanedData_no_isnos_no_outliers.rpt')
-dataframe = dataframe.dropna(axis=0, how='any')
-
-rets = [3]
-
+# kloster_dir = r'C:\Users\Christian\Desktop\Min Git mappe\P5\CleanData\\'
+# patrick_dir = r'C:\Users\Patrick\PycharmProjects\untitled\CleanData\\'
+# ng_dir = r'C:\P5GIT\\'
+#
+# print('Loading data...')
+#
+# dataframe = dl.load_sales_file(patrick_dir + 'CleanedData_no_isnos_no_outliers.rpt')
+# dataframe = dataframe.dropna(axis=0, how='any')
+#
+# rets = [3,4]
+#
 # mysample = dataframe.sample(10000, random_state = 1234)
-
+#
 # mysample = dataframe[dataframe.retailerID.isin(rets)]
-mysample = dataframe[dataframe.chainID == 1]
 
-# testframe = featurize2(mysample)
-# testframe = featurize_chain(mysample)
-testframe = featurize_retailers(mysample)
-
-testframe.to_csv('C:/P5GIT/featurized_ch1_all_ret_features.csv', na_rep = 'bananaphone', index = False, sep=';',encoding='utf-8')
+# testframe = featurize2(dataframe[dataframe.chainID == 1])
+#
+# testframe.to_csv('featurized_ch1_period_testing.csv', na_rep = 'bananaphone', index = False, sep=';',encoding='utf-8')
 
 # import linreg
 
