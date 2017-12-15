@@ -566,18 +566,18 @@ def featurize2(df):
 
     # ret df til data
 
-    df['jan'] = tuple(map(lambda date: date.month == 1, df['date']))
-    df['feb'] = tuple(map(lambda date: date.month == 2, df['date']))
-    df['mar'] = tuple(map(lambda date: date.month == 3, df['date']))
-    df['apr'] = tuple(map(lambda date: date.month == 4, df['date']))
-    df['may'] = tuple(map(lambda date: date.month == 5, df['date']))
-    df['jun'] = tuple(map(lambda date: date.month == 6, df['date']))
-    df['jul'] = tuple(map(lambda date: date.month == 7, df['date']))
-    df['aug'] = tuple(map(lambda date: date.month == 8, df['date']))
-    df['sep'] = tuple(map(lambda date: date.month == 9, df['date']))
-    df['oct'] = tuple(map(lambda date: date.month == 10, df['date']))
-    df['nov'] = tuple(map(lambda date: date.month == 11, df['date']))
-    df['dec'] = tuple(map(lambda date: date.month == 12, df['date']))
+    data['jan'] = tuple(map(lambda date: date.month == 1, df['date']))
+    data['feb'] = tuple(map(lambda date: date.month == 2, df['date']))
+    data['mar'] = tuple(map(lambda date: date.month == 3, df['date']))
+    data['apr'] = tuple(map(lambda date: date.month == 4, df['date']))
+    data['may'] = tuple(map(lambda date: date.month == 5, df['date']))
+    data['jun'] = tuple(map(lambda date: date.month == 6, df['date']))
+    data['jul'] = tuple(map(lambda date: date.month == 7, df['date']))
+    data['aug'] = tuple(map(lambda date: date.month == 8, df['date']))
+    data['sep'] = tuple(map(lambda date: date.month == 9, df['date']))
+    data['oct'] = tuple(map(lambda date: date.month == 10, df['date']))
+    data['nov'] = tuple(map(lambda date: date.month == 11, df['date']))
+    data['dec'] = tuple(map(lambda date: date.month == 12, df['date']))
 
 
     # chain features

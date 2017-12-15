@@ -31,6 +31,22 @@ def pretty_print_linear(coefs, names = None, sort = False):
     return " + ".join("%s * %s" % (round(coef, 3), name)
                                    for coef, name in lst)
 
+def pretty_print_linear2(coefs, names = None):
+    if names == None:
+        names = ["X%s" % x for x in range(len(coefs))]
+
+    df = pd.DataFrame()
+    df['c'] = coefs
+    df['n'] = names
+
+    res = df[df.c != 0.0]
+
+    lst = zip(res.c, res.n)
+
+
+    return " + ".join("%s * %s" % (coef, name)
+                                   for coef, name in lst)
+
 def regress(data, features, target):
 	# print(target)
 	features.append(target)
@@ -40,7 +56,7 @@ def regress(data, features, target):
 
 	df.dropna(inplace = True)
 
-	split_ratio = 0.9
+	split_ratio = 0.8
 
 	# extracting features, scaling,
 	X = np.array(df.drop(target, 1))
@@ -48,6 +64,17 @@ def regress(data, features, target):
 
 	# target
 	y = np.array(df[target])
+
+	# scaling y
+
+	# y_min = min(y)
+	# y_max = max(y)
+	# a = 1
+	# b = 10
+
+	# y = a + (y - y_min)*(b-a) / (y_max - y_min)
+
+	# y = np.log10(y)
 
 	#  splitting data
 	split_index = math.ceil(len(X) * split_ratio)
@@ -65,7 +92,7 @@ def regress(data, features, target):
 	# 				   learning_rate='constant', learning_rate_init=0.001,
 	# 				   power_t=0.5, max_iter=1000, shuffle=False, tol=0.0001)
 	# reg = Ridge(alpha = 0.5)
-	# reg = Lasso(alpha = 0.1)
+	reg = Lasso(alpha = 1.0)
 	# reg = BayesianRidge()
 
 	# reg = nb.BernoulliNB()
@@ -87,6 +114,8 @@ def regress(data, features, target):
 	# print('coefficients: ' + str(reg.coef_))
 	pearson = pn(y_test, prediction_set)
 	print('Pearson: ' + str(pearson))
+	smape = np.mean(abs(y_test - prediction_set) / ((abs(prediction_set) + abs(y_test)) / 2)) * 100
+	print('symmetric mean absolute pct error: ' + str(smape))
 	maxerror = max(abs(y_test - prediction_set))
 	print('max error: ' + str(maxerror))
 	print()
@@ -102,6 +131,9 @@ def regress_use_case(train, test, features, target):
 		df = train[features].copy()
 		df2 = test[features].copy()
 
+def lasso(data, features, target, alp = 1.0):
+	# print(target)
+	features.append(target)
 
 		X_train = np.array(df.drop(target, 1))
 		X_test = np.array(df2.drop(target, 1))

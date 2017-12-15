@@ -14,30 +14,37 @@ from sklearn.metrics import mean_squared_error as mse
 
 def naive_model_smart(df, days = 7, on = 'productID'):
     data = df.copy()
+    # data = data.reset_index()
 
-    data = data[['date', on, 'quantity']]
+    # data = data[['date', on, 'quantity']]
 
-    days_s = str(days) + 'D'
+    # days_s = str(days) + 'D'
 
-    p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0)
-    dates = p.index
-    realdates = pd.date_range(dates[0], dates[len(dates) - 1])
-    p = p.reindex(realdates)
-    p = p.rolling(days_s).sum()
-    target = p.shift(-days)
-    target = target.fillna(0)
+    # p = pd.pivot_table(data, values='quantity', index=['date'], columns=[on], aggfunc=np.sum).fillna(0)
+    # dates = p.index
+    # realdates = pd.date_range(dates[0], dates[len(dates) - 1])
+    # p = p.reindex(realdates)
+    # p = p.rolling(days_s).sum()
+    # target = p.shift(-days)
+    # target = target.fillna(0)
 
-    data['Previous'] = tuple(map(lambda date, label: p.loc[date, label], data['date'], data[on]))
-    data['Next'] = tuple(map(lambda date, label: target.loc[date, label], data['date'], data[on]))
+    # data['Actual'] = tuple(map(lambda date, label: p.loc[date, label], data['date'], data[on]))
+    # data['Predict'] = tuple(map(lambda date, label: target.loc[date, label], data['date'], data[on]))
 
-    errorDF = pd.DataFrame(columns=[['SSE', 'RMS', 'MSE', 'MaxError']], index=[0])
+    data['Actual'] = data['qty_p1_ret_prod_rolling_7']
+    data['Predict'] = data['target_prod_rolling_7']
 
-    errorDF['SSE'] = sum_square_error(data['Previous'], data['Next'])
-    errorDF['RMS'] = root_mean_squares(data['Previous'], data['Next'])
-    errorDF['MSE'] = mse(data['Previous'], data['Next'])
-    errorDF['MaxError'] = max(abs(data['Previous'] - data['Next']))
+    naive = data['Actual'] - data['Predict']
+    naive = pd.Series(naive)
 
-    return errorDF
+    naiveerrormargin = naive.value_counts().fillna(0)
+
+    SSE = sum_square_error(data['Actual'], data['Predict'])
+    RMS = root_mean_squares(data['Actual'], data['Predict'])
+    MSE = mse(data['Actual'], data['Predict'])
+    MaxError = max(abs(data['Actual'] - data['Predict']))
+
+    return SSE, RMS, MSE, MaxError, naiveerrormargin
 
 
 def naivemodel(today, tomorrow):
@@ -269,10 +276,7 @@ features = [
     ]
 #Fast approach
 
-n = 1
-dppp = 0
-dpp = 0
-dp = 0
+
 dataframe = dataframe[dataframe.chainID == 1]
 chains = dataframe.chainID.unique()
 for chain in chains:
@@ -281,12 +285,16 @@ for chain in chains:
 
     chainframe = chainframe.set_index('date')
 
+    fullmodelerror = pd.Series(data = [0])
+    naivemodelerror = pd.Series(data = [0])
+    sumerrorpercent = pd.Series(data =[0])
 
-    directory = os.path.dirname(r'C:\Users\Patrick\PycharmProjects\untitled\RollingLin{0}\\'.format(chain))
+    directory = os.path.dirname(r'C:\Users\Patrick\PycharmProjects\untitled\NN{0}\\'.format(chain))
     if not os.path.exists(directory):
          os.makedirs(directory)
 
     errorDF = pd.DataFrame(columns=[['SSE', 'RMS', 'MSE', 'MaxError']], index=range(0,69))
+    naiveerrorDF = pd.DataFrame(columns=[['SSE', 'RMS', 'MSE', 'MaxError']], index=range(0,69))
     n = 1
     for group_name, df_group in chainframe.groupby(pd.TimeGrouper(freq="W")):
         if n == 1:
@@ -296,13 +304,17 @@ for chain in chains:
             newframe = df_group.copy().reset_index()
             newframe.index = newframe.index+df._stat_axis.size
             predict = linreg.regress_use_case(df, newframe, features, target='target_prod_rolling_7')
+            naive = naive_model_smart(newframe)
+
             df = df.append(df_group.copy().reset_index(), ignore_index=True)
+            #Fejlmargen model figur
+            plt.close()
             test = test_of_model(predict[2], predict[1])
             errormarginmodel = test[1]
             errormarginmodel = errormarginmodel.sort_index()
             predicted = predict[1]
             predicted = np.round_(predicted)
-            plt.close()
+            fullmodelerror = fullmodelerror.add(errormarginmodel, fill_value=0)
             errormarginmodel = errormarginmodel / errormarginmodel.sum()
             plt.figure()
             errormarginmodel.plot()
@@ -311,78 +323,96 @@ for chain in chains:
             plt.title('Model error margin, procent {0}'.format(test[2]))
             plt.tight_layout()
             plt.savefig('{0}/Model_error_margin_norm_{1}'.format(directory, n))
+            #Actual fejl procent figur
+            plt.close()
+            errorpercentmodel = (predict[2] - predicted) / predict[2]
+            errorpercentmodel[np.isneginf(errorpercentmodel)] = 0
+            errorpercentmodel[np.isposinf(errorpercentmodel)] = 0
+            errorpercentmodel = errorpercentmodel * 100
+            errorpercentdf = pd.Series(errorpercentmodel)
+            errorpercent = errorpercentdf.value_counts().fillna(0)
+            errorpercent = errorpercent.sort_index()
+            sumerrorpercent = sumerrorpercent.add(errorpercent, fill_value=0)
+            errorpercent = errorpercent / errorpercent.sum()
+            plt.figure()
+            errorpercent.plot()
+            plt.ylabel('Hyppighed')
+            plt.xlabel('Procent')
+            plt.title('Model procent fejl ifht. actual')
+            plt.tight_layout()
+            plt.savefig('{0}/Model_error_percent_{1}'.format(directory, n))
+            #Fejlmargen naive figur
+            plt.close()
+            naiveerrormargin = naive[4]
+            naiveerrormargin = naiveerrormargin.sort_index()
+            naivemodelerror = naivemodelerror.add(naiveerrormargin, fill_value=0)
+
+            naiveerrormargin = naiveerrormargin / naiveerrormargin.sum()
+
+            if 0 in naiveerrormargin.index._data:
+                percent = (naiveerrormargin.loc[0] / naiveerrormargin.sum(axis=0)) * 100
+            else:
+                percent = 0
+            plt.figure()
+            naiveerrormargin.plot()
+            plt.ylabel('Hyppighed')
+            plt.xlabel('Fejl')
+            plt.title('Model error margin, procent {0}'.format(percent))
+            plt.tight_layout()
+            plt.savefig('{0}/NaiveModel_error_margin_norm_{1}'.format(directory, n))
+
             errorDF.iloc[n-1]['SSE'] = sum_square_error(predict[2],predicted)
             errorDF.iloc[n-1]['RMS'] = root_mean_squares(predict[2], predicted)
             errorDF.iloc[n - 1]['MSE'] = mse(predict[2], predicted)
             errorDF.iloc[n - 1]['MaxError'] = max(abs(predict[2] - predicted))
+
+            naiveerrorDF.iloc[n - 1]['SSE'] = naive[0]
+            naiveerrorDF.iloc[n - 1]['RMS'] = naive[1]
+            naiveerrorDF.iloc[n - 1]['MSE'] = naive[2]
+            naiveerrorDF.iloc[n - 1]['MaxError'] = naive[3]
         n = n + 1
         print(errorDF)
     errorDF.to_csv(path_or_buf=directory + 'ErrorFrame.rpt', index=False, sep=';', encoding='utf-8')
-    chainframe = chainframe.reset_index()
-    naive = naive_model_smart(chainframe)
-    naive.to_csv(path_or_buf=directory + 'Naive.rpt', index=False, sep=';', encoding='utf-8')
+    naiveerrorDF.to_csv(path_or_buf=directory + 'Naive.rpt', index=False, sep=';', encoding='utf-8')
+    print('Model error margin sum')
+    print(fullmodelerror)
+    if 0 in fullmodelerror.index._data:
+        percent = (fullmodelerror.loc[0] / fullmodelerror.sum(axis=0)) * 100
+    else:
+        percent = 0
+    fullmodelerror = fullmodelerror/fullmodelerror.sum()
+    plt.figure()
+    fullmodelerror.plot()
+    fullmodelerror.to_csv(path=directory + 'FullSumError.rpt', index=False, sep=';', encoding='utf-8')
+    plt.ylabel('Hyppighed')
+    plt.xlabel('Fejl')
+    plt.title('Model error margin, procent {0}'.format(percent))
+    plt.tight_layout()
+    plt.savefig('{0}/Model_error_margin_norm_sum'.format(directory, n))
+    print()
+    print('Naive error margin sum')
+    print(naivemodelerror)
+    if 0 in naivemodelerror.index._data:
+        percent = (naivemodelerror.loc[0] / naivemodelerror.sum(axis=0)) * 100
+    else:
+        percent = 0
+    naivemodelerror = naivemodelerror / naivemodelerror.sum()
+    plt.figure()
+    naivemodelerror.plot()
+    naivemodelerror.to_csv(path=directory + 'NaiveFullSumError.rpt', index=False, sep=';', encoding='utf-8')
+    plt.ylabel('Hyppighed')
+    plt.xlabel('Fejl')
+    plt.title('Model error margin, procent {0}'.format(percent))
+    plt.tight_layout()
+    plt.savefig('{0}/Naive_error_margin_norm_sum'.format(directory, n))
 
-
-    #Slow approach from here
-# for chain in chains:
-#     chainframe = dataframe[dataframe.chainID == chain]
-#
-#     chainframe = chainframe.set_index('date')
-#     errorDF = pd.DataFrame(columns=[['SSE', 'RMS', 'MSE', 'MaxError']], index=range(0,69))
-#     directory = os.path.dirname(r'C:\Users\Patrick\PycharmProjects\untitled\NBChain{0}NFReplaceW1\\'.format(chain))
-#     if not os.path.exists(directory):
-#         os.makedirs(directory)
-#     for group_name, df_group in chainframe.groupby(pd.TimeGrouper(freq="W")):
-#         if n == 1:
-#             df = df_group.copy()
-#             df = df.reset_index()
-#             featureframe = FO.featurize2(df)
-#         else:
-#             df = df.append(df_group.copy().reset_index(), ignore_index=True)
-#             if dppp != 0:
-#                 mask = (df['date'] > dppp)
-#                 newfeature = df.loc[mask]
-#                 if not(newfeature.empty):
-#                     newframe = FO.featurize2(newfeature)  # df_group.copy().reset_index())
-#                     featureframe = featureframe.append(newframe)
-#                     newframe.index = newframe.index+df._stat_axis.size
-#             elif dpp != 0:
-#                 mask = (df['date'] > dpp)
-#                 newfeature = df.loc[mask]
-#                 if not(newfeature.empty):
-#                     newframe = FO.featurize2(newfeature)#df_group.copy().reset_index())
-#                     featureframe = featureframe.append(newframe)
-#                     newframe.index = newframe.index+df._stat_axis.size
-#             elif dp != 0:
-#                 newfeature = df_group.copy().reset_index()
-#                 if not(newfeature.empty):
-#                     newframe = FO.featurize2(newfeature)  # df_group.copy().reset_index())
-#                     featureframe = featureframe.append(newframe)
-#                     newframe.index = newframe.index + df._stat_axis.size
-#             if not(featureframe.empty):
-#                 predict = linreg.regress_use_case(featureframe, newframe, features, target='target_prod_rolling_7')
-#             test = test_of_model(predict[2], predict[1])
-#             errormarginmodel = test[1]
-#             errormarginmodel = errormarginmodel.sort_index()
-#             predicted = predict[1]
-#             predicted = np.round_(predicted)
-#             plt.close()
-#             errormarginmodel = errormarginmodel / errormarginmodel.sum()
-#             plt.figure()
-#             errormarginmodel.plot()
-#             plt.ylabel('Hyppighed')
-#             plt.xlabel('Fejl')
-#             plt.title('Model error margin, procent {0}'.format(test[2]))
-#             plt.tight_layout()
-#             plt.savefig('{0}/Model_error_margin_norm_{1}'.format(directory, n))
-#             errorDF.iloc[n - 1]['SSE'] = sum_square_error(predict[2], predicted)
-#             errorDF.iloc[n - 1]['RMS'] = root_mean_squares(predict[2], predicted)
-#             errorDF.iloc[n - 1]['MSE'] = mse(predict[2], predicted)
-#             errorDF.iloc[n - 1]['MaxError'] = max(abs(predict[2] - predicted))
-#         n = n + 1
-#         dppp = dpp
-#         dpp = dp
-#         dp = group_name
-#     print(errorDF)
-#     errorDF = errorDF.fillna(value=0)
-#     errorDF.to_csv(path_or_buf=directory + 'ErrorFrame1.rpt', index=False, sep=';', encoding='utf-8')
+    plt.close()
+    sumerrorpercent = sumerrorpercent / sumerrorpercent.sum()
+    plt.figure()
+    sumerrorpercent.plot()
+    sumerrorpercent.to_csv(path=directory + 'FullSumError.rpt', index=False, sep=';', encoding='utf-8')
+    plt.ylabel('Hyppighed')
+    plt.xlabel('Procent')
+    plt.title('Model procent fejl ifht. actual')
+    plt.tight_layout()
+    plt.savefig('{0}/Model_error_percent_sum'.format(directory, n))

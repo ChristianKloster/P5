@@ -1,5 +1,6 @@
 import linreg
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 from scipy.stats import pearsonr
@@ -68,6 +69,16 @@ features = [
 
 targets = ['target_prod_rolling_7', 'target_style_rolling_7','target_prod_rolling_3', 'target_style_rolling_3','target_prod_rolling_1', 'target_style_rolling_1']
 
+def my_log_scale(x):
+	x_min = min(x)
+	x_max = max(x)
+	a = 1
+	b = 10
+	temp = a + (x - x_min)*(b-a) / (x_max - x_min)
+	res = np.log10(temp)
+	return res
+
+
 df = pd.DataFrame()
 
 for t in targets:
@@ -76,10 +87,13 @@ for t in targets:
 for t in targets:
 	for f in features:
 
+		x = my_log_scale(data[f])
+		y = my_log_scale(data[t])
+
 		plt.Figure()
-		plt.plot(data[f], data[t], 'b.')
+		plt.plot(x, y , 'b.')
 		plt.ylabel(t)
 		plt.xlabel(f)
-		plt.savefig('C:/P5GIT/' + f +'_'+ t + '.png')
+		plt.savefig('C:/P5GIT/' + f +'_'+ t + '_log_scaled.png')
 		plt.close()
 
